@@ -68,6 +68,7 @@ def readRawColumns():
     dfcol['label2'] = dfcol.index
     dfcol['label2'] = dfcol['label'] + \
         dfcol['label2'].apply(lambda i: '_' + str(i))
+    # label2 column guaranteed to be unique
     print('dfcol\n', dfcol)
     print("dfcol2", dfcol['label2'][:5])
     
@@ -190,4 +191,20 @@ dftrain['fBGyroMag_Mean_529'].hist(by=dftrain_y['activity'])
 # try different data cleaning versions
 clf = RandomForestClassifier(n_estimators=10)
 rfFitScore(clf, dftrain, dftest)
+# score 0.901
+# Cross table shows ~10 percent covariance within
+#   sedentary activities (LAYING SITTING STANDING)
+#   and within active activities (WALKING UPSTAIRS DOWNSTAIRS),
+#   but almost no covariance between active and 
+#   sedentary activities.
+
+clf = RandomForestClassifier(n_estimators=20)
+rfFitScore(clf, dftrain, dftest)
+# score 0.913
+
+clf = RandomForestClassifier(n_estimators=5)
+rfFitScore(clf, dftrain, dftest)
+# score 0.896
+
+# score almost unchanged, maybe 0.5 to 1.0 %
 
