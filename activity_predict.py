@@ -6,14 +6,7 @@ from functools import reduce
 import os
 import re
 
-# init data
-
 datadir = "data/UCI_HAR_Dataset/"
-
-feature_file = datadir + "features.txt"
-dfcol = pd.read_csv(feature_file, sep='\s+', header=None, index_col=0)
-dfcol.columns=['label']
-print('dfcol\n', dfcol)
 
 # should be a way to do this all in one regex
 def parseColumn(ss):
@@ -49,6 +42,7 @@ def parseColumn(ss):
     tt = tt.replace('angle','angle_')
     return tt
 
+# test parseColumn()
 # ss = 'tBodyGyroJerk(Mag)-arCoeff()4)'
 # ss = 'fBodyAcc-mad()-Y'
 # ss = 'tBodyAccJerk-correlation()-Y,Z'
@@ -63,114 +57,137 @@ def parseColumn(ss):
 # tt = parseColumn(ss)
 # print('tt', tt)
 
-dfcol['label'] = dfcol['label'].apply(lambda s: parseColumn(s))
-dfcol['label2'] = dfcol.index
-dfcol['label2'] = dfcol['label'] + \
-    dfcol['label2'].apply(lambda i: '_' + str(i))
-print('dfcol\n', dfcol)
-print("dfcol2", dfcol['label2'][:5])
+def readRawColumns():
+    '''read raw data columns'''
+    feature_file = datadir + "features.txt"
+    dfcol = pd.read_csv(feature_file, sep='\s+', header=None, index_col=0)
+    dfcol.columns=['label']
+    print('dfcol\n', dfcol)
+    
+    dfcol['label'] = dfcol['label'].apply(lambda s: parseColumn(s))
+    dfcol['label2'] = dfcol.index
+    dfcol['label2'] = dfcol['label'] + \
+        dfcol['label2'].apply(lambda i: '_' + str(i))
+    print('dfcol\n', dfcol)
+    print("dfcol2", dfcol['label2'][:5])
+    
+    print('yaa',dfcol.shape[0])
+    # for i in range(dfcol.shape[0]//2):
+    #     print(dfcol['label'][i+1+dfcol.shape[0]//2])
+    clist = list(dfcol['label'])
+    
+    print('head clist', len(clist), clist[:5])  # 561
+    cset = set(clist)
+    print('head cset', len(cset), list(cset)[:5])  # 469
+    print('done')
+    
+    # read in whole dataframe before removing duplicate columns?
+    # count duplicates, rename w/ counter, check if columns equal?
+    # 561 - 469 = 92 duplicates
+    
+    # cc = []
+    # for c in clist:
+    #     cc.append( clist.count(c) )
+    # cc = list(map(clist.count. clist))
+    # print('cc', cc[:5])
+    # print('clist', len(clist), clist)
+    
+    return dfcol
 
-print('yaa',dfcol.shape[0])
-# // 2 since sypder buffer size is small
-# for i in range(dfcol.shape[0]//2):
-#     print(dfcol['label'][i+1+dfcol.shape[0]//2])
-clist = list(dfcol['label'])
+def readActivityLabels():
+    '''read activity labels'''
+    dfact = pd.read_table(datadir + "activity_labels.txt", \
+        sep='\s+', header=None, index_col=0)
+    dfact.columns=['act']
+    print("dfact\n", dfact)
+    return dfact
 
-print('head clist', len(clist), clist[:5])  # 561
-cset = set(clist)
-print('head cset', len(cset), list(cset)[:5])  # 469
-print('done')
+def readRawTrainData():
+    '''read in raw train data'''
+    traindir = datadir + "train/"
+    dftrain = pd.read_table(traindir + "X_train.txt", \
+        sep='\s+', header=None, names=dfcol['label2'])
+    dftrain['subject'] = pd.read_table(traindir + "subject_train.txt", \
+        sep='\s+', header=None)
+    dftrain_y = pd.read_table(traindir + "y_train.txt", \
+        sep='\s+', header=None, names=['Y'])
+    dftrain_y['activity'] = dftrain_y['Y'].apply(lambda x: \
+        dfact['act'][dfact.index[x-1]])
+    print("dftrain head\n", dftrain[:5])
+    print("dftrain_y shape", dftrain_y.shape, "head\n", dftrain_y[295:305])
+    return dftrain, dftrain_y
 
-# read in whole dataframe before removing duplicate columns?
-# count duplicates, rename w/ counter, check if columns equal?
-# 561 - 469 = 92 duplicates
-
-# cc = []
-# for c in clist:
-#     cc.append( clist.count(c) )
-# cc = list(map(clist.count. clist))
-# print('cc', cc[:5])
-
-# activity labels
-dfact = pd.read_table(datadir + "activity_labels.txt", \
-    sep='\s+', header=None, index_col=0)
-dfact.columns=['act']
-print("dfact\n", dfact)
-
-# read in raw data
-traindir = datadir + "train/"
-dftrain = pd.read_table(traindir + "X_train.txt", \
-    sep='\s+', header=None, names=dfcol['label2'])
-dftrain['subject'] = pd.read_table(traindir + "subject_train.txt", \
-    sep='\s+', header=None)
-dftrain_y = pd.read_table(traindir + "y_train.txt", \
-    sep='\s+', header=None, names=['Y'])
-dftrain_y['activity'] = dftrain_y['Y'].apply(lambda x: \
-    dfact['act'][dfact.index[x-1]])
-print("dftrain head\n", dftrain[:5])
-print("dftrain_y shape", dftrain_y.shape, "head\n", dftrain_y[295:305])
-
-testdir = datadir + "test/"
-dftest = pd.read_table(testdir + "X_test.txt", \
-    sep='\s+', header=None, names=dfcol['label2'])
-dftest['subject'] = pd.read_table(testdir + "subject_test.txt", \
-    sep='\s+', header=None)
-dftest_y = pd.read_table(testdir + "y_test.txt", \
-    sep='\s+', header=None, names=['Y'])
-dftest_y['activity'] = dftest_y['Y'].apply(lambda x: \
-    dfact['act'][dfact.index[x-1]])
-print("dftest head", dftest.shape, "\n", dftest[:5])
-print("dftest_y shape", dftest_y.shape, "head\n", dftest_y[:5])
-
-# compare columns, check if duplicate names have duplicate values
-
-# print('clist', len(clist), clist)
-
-print("dftest tAccMagMean head", dftest['tAccMag_Mean_201'][:5])
-print("dftest fAccMagMean head", dftest['fAccMag_Mean_503'][:5])
-print("dftrain tAccMagMean head", dftrain['tAccMag_Mean_201'][:5])
-print("dftrain fAccMagMean head", dftrain['fAccMag_Mean_503'][:5])
-print("dftrain tGyroMag_Mean head", dftrain['tGyroMag_Mean_240'][:5])
-print("dftrain fBGyroMag_Mean head", dftrain['fBGyroMag_Mean_529'][:5])
-
-#dftrain['tAccMag_Mean_201'].hist(by=dftrain_y['activity'])
-#dftrain['fAccMag_Mean_503'].hist(by=dftrain_y['activity'])
-#dftrain['tGyroMag_Mean_240'].hist(by=dftrain_y['activity'])
-#dftrain['fBGyroMag_Mean_529'].hist(by=dftrain_y['activity'])
-
-# random forest
-clf = RandomForestClassifier(n_estimators=10)
+def readRawTestData():
+    testdir = datadir + "test/"
+    dftest = pd.read_table(testdir + "X_test.txt", \
+        sep='\s+', header=None, names=dfcol['label2'])
+    dftest['subject'] = pd.read_table(testdir + "subject_test.txt", \
+        sep='\s+', header=None)
+    dftest_y = pd.read_table(testdir + "y_test.txt", \
+        sep='\s+', header=None, names=['Y'])
+    dftest_y['activity'] = dftest_y['Y'].apply(lambda x: \
+        dfact['act'][dfact.index[x-1]])
+    print("dftest head", dftest.shape, "\n", dftest[:5])
+    print("dftest_y shape", dftest_y.shape, "head\n", dftest_y[:5])
+    return dftest, dftest_y
 
 def rfFitScore(clf, dftrain, dftest):
+    '''random forest classifier fit and score.
+       clf=RandomForestClassifier, dftrain=train data,
+       dftest=test data'''
+    
+    clfit = clf.fit(dftrain, dftrain_y['Y'])  # clf.fit(X, y)
+    
+    imp = clfit.feature_importances_  # ndarray of 562
+    print("importances", imp.shape, "\n", imp[:12], "\n...\n", imp[-12:])
+    
+    # clfit.fit_transform( X, y=None )  # returns X_new
+    
+    new_y = clfit.predict( dftest )  # returns predicted Y
+    
+    test_score = clfit.score( dftest, dftest_y['Y'] )
+    print("test score:", test_score)    
+    
+    # calculate test score by other means
+    print("test predict True %.3f percent, %d out of %d" % \
+      ((100 * sum(dftest_y['Y'] == new_y) / dftest_y.shape[0]), \
+       sum(dftest_y['Y'] == new_y), dftest_y.shape[0]))
+    print("test predict False %.3f percent, %d out of %d" % \
+      ((100 * sum(dftest_y['Y'] != new_y) / dftest_y.shape[0]), \
+       sum(dftest_y['Y'] != new_y), dftest_y.shape[0]))
+    
+    new_p = clfit.predict_proba( dftest )
+    # probability of each X variable to predict each y class
+    print("test predict probabilities head:\n", new_p[:12])
+    
+    # cross table of variable predictions
+    ptab = pd.crosstab(dftest_y['Y'], new_y, \
+        rownames=['actual'], colnames=['predicted'])
+    print("cross table:\n", ptab)
 
-# clfit = clf.fit(X, y)
-clfit = clf.fit(dftrain, dftrain_y['Y'])
-imp = clfit.feature_importances_  # ndarray of 562
-print("importances", imp.shape, "\n", imp[:12], "\n...\n", imp[-12:])
+dfcol = readRawColumns()
+dfact = readActivityLabels()
+dftrain, dftrain_y = readRawTrainData()
+dftest, dftest_y = readRawTestData()
 
-# clfit.predict( X )
-# clfit.predict_proba( X )
-# clfit.fit_transform( X, y=None )  # returns X_new
-# clfit.score( X, y )
-test_score = clfit.score( dftest, dftest_y['Y'] )
-print("test score:", test_score)
+#print("dftest tAccMagMean head", dftest['tAccMag_Mean_201'][:5])
+#print("dftest fAccMagMean head", dftest['fAccMag_Mean_503'][:5])
+#print("dftrain tAccMagMean head", dftrain['tAccMag_Mean_201'][:5])
+#print("dftrain fAccMagMean head", dftrain['fAccMag_Mean_503'][:5])
+#print("dftrain tGyroMag_Mean head", dftrain['tGyroMag_Mean_240'][:5])
+#print("dftrain fBGyroMag_Mean head", dftrain['fBGyroMag_Mean_529'][:5])
 
-new_y = clfit.predict( dftest )  # returns predicted Y ndarray
-# print("test predict new:", new_y[:20])
-print("test predict True %.2f percent, %d out of %d" % \
-  ((100 * sum(dftest_y['Y'] == new_y) / dftest_y.shape[0]), \
-   sum(dftest_y['Y'] == new_y), dftest_y.shape[0]))
-# same as test_score
-print("test predict False %.2f percent, %d out of %d" % \
-  ((100 * sum(dftest_y['Y'] != new_y) / dftest_y.shape[0]), \
-   sum(dftest_y['Y'] != new_y), dftest_y.shape[0]))
+dftrain['tAccMag_Mean_201'].hist(by=dftrain_y['activity'])
+dftrain['fAccMag_Mean_503'].hist(by=dftrain_y['activity'])
+dftrain['tGyroMag_Mean_240'].hist(by=dftrain_y['activity'])
+dftrain['fBGyroMag_Mean_529'].hist(by=dftrain_y['activity'])
 
-new_p = clfit.predict_proba( dftest )
-# probability of each X variable to predict each y class
-print("test predict probabilities:\n", new_p[:20])
+# compare columns, check if duplicate names have duplicate values
+# clist = list(dfcol['label'])
+# print('clist', len(clist), clist)
 
-ptab = pd.crosstab(dftest_y['Y'], new_y, \
-    rownames=['actual'], colnames=['preds'])
-print("cross table:\n", ptab)
-
+# try different random forest parameters
+# try different data cleaning versions
+clf = RandomForestClassifier(n_estimators=10)
+rfFitScore(clf, dftrain, dftest)
 
