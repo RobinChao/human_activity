@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
 from functools import reduce
 import os
 import re
@@ -102,24 +103,64 @@ dftrain = pd.read_table(traindir + "X_train.txt", \
     sep='\s+', header=None, names=dfcol['label2'])
 dftrain['subject'] = pd.read_table(traindir + "subject_train.txt", \
     sep='\s+', header=None)
-dftrain['Y'] = pd.read_table(traindir + "y_train.txt", \
-    sep='\s+', header=None)
-dftrain['YA'] = dftrain['Y'].apply(lambda x: dfact['act'][dfact.index[x-1]])
+dftrain_y = pd.read_table(traindir + "y_train.txt", \
+    sep='\s+', header=None, names=['Y'])
+dftrain_y['activity'] = dftrain_y['Y'].apply(lambda x: \
+    dfact['act'][dfact.index[x-1]])
 print("dftrain head\n", dftrain[:5])
+print("dftrain_y shape", dftrain_y.shape, "head\n", dftrain_y[295:305])
 
 testdir = datadir + "test/"
 dftest = pd.read_table(testdir + "X_test.txt", \
     sep='\s+', header=None, names=dfcol['label2'])
 dftest['subject'] = pd.read_table(testdir + "subject_test.txt", \
     sep='\s+', header=None)
-dftest['Y'] = pd.read_table(testdir + "y_test.txt", \
-    sep='\s+', header=None)
-dftest['YA'] = dftest['Y'].apply(lambda x: dfact['act'][dfact.index[x-1]])
-print("dftest head\n", dftest[:5])
+dftest_y = pd.read_table(testdir + "y_test.txt", \
+    sep='\s+', header=None, names=['Y'])
+dftest_y['activity'] = dftest_y['Y'].apply(lambda x: \
+    dfact['act'][dfact.index[x-1]])
+print("dftest head", dftest.shape, "\n", dftest[:5])
+print("dftest_y shape", dftest_y.shape, "head\n", dftest_y[:5])
 
 # compare columns, check if duplicate names have duplicate values
 
 # print('clist', len(clist), clist)
 
+print("dftest tAccMagMean head", dftest['tAccMag_Mean_201'][:5])
+print("dftest fAccMagMean head", dftest['fAccMag_Mean_503'][:5])
+print("dftrain tAccMagMean head", dftrain['tAccMag_Mean_201'][:5])
+print("dftrain fAccMagMean head", dftrain['fAccMag_Mean_503'][:5])
+print("dftrain tGyroMag_Mean head", dftrain['tGyroMag_Mean_240'][:5])
+print("dftrain fBGyroMag_Mean head", dftrain['fBGyroMag_Mean_529'][:5])
 
+#dftrain['tAccMag_Mean_201'].hist(by=dftrain_y['activity'])
+#dftrain['fAccMag_Mean_503'].hist(by=dftrain_y['activity'])
+#dftrain['tGyroMag_Mean_240'].hist(by=dftrain_y['activity'])
+#dftrain['fBGyroMag_Mean_529'].hist(by=dftrain_y['activity'])
+
+# random forest
+clf = RandomForestClassifier(n_estimators=10)
+# clfit = clf.fit(X, y)
+clfit = clf.fit(dftrain, dftrain_y['Y'])
+imp = clfit.feature_importances_  # ndarray of 562
+print("importances", imp.shape, "\n", imp[:12], "\n...\n", imp[-12:])
+
+# clfit.predict( X )
+# clfit.predict_proba( X )
+# clfit.fit_transform( X, y=None )  # returns X_new
+# clfit.score( X, y )
+test_score = clfit.score( dftest, dftest_y['Y'] )
+print("test score:", test_score)
+
+new_y = clfit.predict( dftest )  # returns predicted Y ndarray
+# print("test predict new:", new_y[:20])
+print("test predict True %.2f percent, %d out of %d" % \
+  ((100 * sum(dftest_y['Y'] == new_y) / dftest_y.shape[0]), \
+   sum(dftest_y['Y'] == new_y), dftest_y.shape[0]))
+print("test predict False %.2f percent, %d out of %d" % \
+  ((100 * sum(dftest_y['Y'] != new_y) / dftest_y.shape[0]), \
+   sum(dftest_y['Y'] != new_y), dftest_y.shape[0]))
+
+new_p = clfit.predict_proba( dftest )
+# probability of each X variable to predict each y class
 
