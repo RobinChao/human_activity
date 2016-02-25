@@ -140,6 +140,9 @@ print("dftrain fBGyroMag_Mean head", dftrain['fBGyroMag_Mean_529'][:5])
 
 # random forest
 clf = RandomForestClassifier(n_estimators=10)
+
+def rfFitScore(clf, dftrain, dftest):
+
 # clfit = clf.fit(X, y)
 clfit = clf.fit(dftrain, dftrain_y['Y'])
 imp = clfit.feature_importances_  # ndarray of 562
@@ -157,10 +160,17 @@ new_y = clfit.predict( dftest )  # returns predicted Y ndarray
 print("test predict True %.2f percent, %d out of %d" % \
   ((100 * sum(dftest_y['Y'] == new_y) / dftest_y.shape[0]), \
    sum(dftest_y['Y'] == new_y), dftest_y.shape[0]))
+# same as test_score
 print("test predict False %.2f percent, %d out of %d" % \
   ((100 * sum(dftest_y['Y'] != new_y) / dftest_y.shape[0]), \
    sum(dftest_y['Y'] != new_y), dftest_y.shape[0]))
 
 new_p = clfit.predict_proba( dftest )
 # probability of each X variable to predict each y class
+print("test predict probabilities:\n", new_p[:20])
+
+ptab = pd.crosstab(dftest_y['Y'], new_y, \
+    rownames=['actual'], colnames=['preds'])
+print("cross table:\n", ptab)
+
 
