@@ -3,6 +3,7 @@
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from functools import reduce
+from itertools import groupby
 import os
 import re
 
@@ -89,7 +90,7 @@ def readRawColumns():
     # cc = []
     # for c in clist:
     #     cc.append( clist.count(c) )
-    # cc = list(map(clist.count. clist))
+    # cc = list(map(lambda c: clist.count(c), clist))
     # print('cc', cc[:5])
     # print('clist', len(clist), clist)
     
@@ -103,7 +104,7 @@ def readActivityLabels():
     print("dfact\n", dfact)
     return dfact
 
-def readRawTrainData():
+def readRawTrainData(dfcol):
     '''read in raw train data'''
     traindir = datadir + "train/"
     dftrain = pd.read_table(traindir + "X_train.txt", \
@@ -118,7 +119,7 @@ def readRawTrainData():
     print("dftrain_y shape", dftrain_y.shape, "head\n", dftrain_y[295:305])
     return dftrain, dftrain_y
 
-def readRawTestData():
+def readRawTestData(dfcol):
     testdir = datadir + "test/"
     dftest = pd.read_table(testdir + "X_test.txt", \
         sep='\s+', header=None, names=dfcol['label2'])
@@ -141,6 +142,7 @@ def rfFitScore(clf, dftrain, dftest):
     
     imp = clfit.feature_importances_  # ndarray of 562
     print("importances", imp.shape, "\n", imp[:12], "\n...\n", imp[-12:])
+    print("sorted imps\n", (sorted(imp))[-20:])   
     
     # clfit.fit_transform( X, y=None )  # returns X_new
     
@@ -165,11 +167,12 @@ def rfFitScore(clf, dftrain, dftest):
     ptab = pd.crosstab(dftest_y['Y'], new_y, \
         rownames=['actual'], colnames=['predicted'])
     print("cross table:\n", ptab)
+    return test_score, imp
 
 dfcol = readRawColumns()
 dfact = readActivityLabels()
-dftrain, dftrain_y = readRawTrainData()
-dftest, dftest_y = readRawTestData()
+dftrain, dftrain_y = readRawTrainData(dfcol)
+dftest, dftest_y = readRawTestData(dfcol)
 
 #print("dftest tAccMagMean head", dftest['tAccMag_Mean_201'][:5])
 #print("dftest fAccMagMean head", dftest['fAccMag_Mean_503'][:5])
@@ -184,13 +187,23 @@ dftrain['tGyroMag_Mean_240'].hist(by=dftrain_y['activity'])
 dftrain['fBGyroMag_Mean_529'].hist(by=dftrain_y['activity'])
 
 # compare columns, check if duplicate names have duplicate values
-# clist = list(dfcol['label'])
-# print('clist', len(clist), clist)
+clist = list(dfcol['label'])
+print('clist', len(clist), clist[:5])
 
 # try different random forest parameters
 # try different data cleaning versions
 clf = RandomForestClassifier(n_estimators=10)
-rfFitScore(clf, dftrain, dftest)
+score, imp = rfFitScore(clf, dftrain, dftest)
+
+def getImportantColumns(dfcol, imp, level=0.01):
+    '''sort column names by RandomForest importance
+       for use in dftrain, dftest subset'''
+    cslist = sorted(zip(imp, list(dfcol['label2'])), reverse=True)
+    cilist = list(filter(lambda e: e[0] > level, cslist))
+    return list(map(lambda e: e[1], cilist))
+
+impcol = getImportantColumns(dfcol, imp, 0.01)
+
 # score 0.901
 # Cross table shows ~10 percent covariance within
 #   sedentary activities (LAYING SITTING STANDING)
@@ -198,13 +211,31 @@ rfFitScore(clf, dftrain, dftest)
 #   but almost no covariance between active and 
 #   sedentary activities.
 
-clf = RandomForestClassifier(n_estimators=20)
-rfFitScore(clf, dftrain, dftest)
+# clf = RandomForestClassifier(n_estimators=20)
+# rfFitScore(clf, dftrain, dftest)
 # score 0.913
 
-clf = RandomForestClassifier(n_estimators=5)
-rfFitScore(clf, dftrain, dftest)
+# clf = RandomForestClassifier(n_estimators=5)
+# rfFitScore(clf, dftrain, dftest)
 # score 0.896
 
 # score almost unchanged, maybe 0.5 to 1.0 %
+
+# compare columns, check if duplicate names have duplicate values
+clist = list(dfcol['label'])
+
+hh = {}
+for c in clist:
+    if c in hh.keys():
+        hh[c] += 1
+    else:
+        hh[c] = 1
+# could write first bit as dict / list comp
+dups = [k for (k,v) in hh.items() if v > 1]
+dups = sorted(dups)
+
+dc = list(dfcol['label2'])
+dg = list(filter(lambda s: s.startswith(dups[0]), dc))
+dt = dftrain[dg]  # not identical but within 3-4 places
+
 
