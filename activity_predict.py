@@ -73,7 +73,10 @@ def readRawColumns():
     print('dfcol\n', dfcol)
     print("dfcol2", dfcol['label2'][:5])
     
-    print('yaa',dfcol.shape[0])
+    # really what I ought to do is create unique labels
+    # only for duplicate column names, not _str(i)
+    
+    print('dfcol shape',dfcol.shape)
     # for i in range(dfcol.shape[0]//2):
     #     print(dfcol['label'][i+1+dfcol.shape[0]//2])
     clist = list(dfcol['label'])
@@ -190,6 +193,46 @@ dftrain['fBGyroMag_Mean_529'].hist(by=dftrain_y['activity'])
 clist = list(dfcol['label'])
 print('clist', len(clist), clist[:5])
 
+# test duplicate columns
+def test_duplicate_columns(dfcol):
+    # compare columns, check if duplicate names have duplicate values
+    clist = list(dfcol['label'])
+    hh = {}
+    for c in clist:
+        if c in hh.keys():
+            hh[c] += 1
+        else:
+            hh[c] = 1
+    # could write first bit as dict / list comp
+    dups = [k for (k,v) in hh.items() if v > 1]
+    dups = sorted(dups)
+    
+    print("DUPS")
+    dc = list(dfcol['label2'])
+    for dup in dups:
+        dg = list(filter(lambda s: s.startswith(dup), dc))
+        dt = dftrain[dg]
+        print("dt dup %s mean" % dup)
+        print(dt.mean())
+    # values, mean are close but not identical
+
+test_duplicate_columns(dfcol)
+# I suppose the question is not are they identical,
+# but how to eliminate some columns that contain nearly
+# the same information, that do not contribute to analysis
+
+# new column names
+hh = {}
+dlist = []
+for c in clist:
+    if c in hh.keys():
+        hh[c] += 1
+        dlist.append(c + '_' + str(hh[c]))
+    else:
+        hh[c] = 0
+        dlist.append(c)
+dfcol['label3'] = dlist
+
 # try different random forest parameters
 # try different data cleaning versions
 clf = RandomForestClassifier(n_estimators=10)
@@ -221,21 +264,21 @@ impcol = getImportantColumns(dfcol, imp, 0.01)
 
 # score almost unchanged, maybe 0.5 to 1.0 %
 
-# compare columns, check if duplicate names have duplicate values
-clist = list(dfcol['label'])
-
-hh = {}
-for c in clist:
-    if c in hh.keys():
-        hh[c] += 1
-    else:
-        hh[c] = 1
-# could write first bit as dict / list comp
-dups = [k for (k,v) in hh.items() if v > 1]
-dups = sorted(dups)
-
-dc = list(dfcol['label2'])
-dg = list(filter(lambda s: s.startswith(dups[0]), dc))
-dt = dftrain[dg]  # not identical but within 3-4 places
+## compare columns, check if duplicate names have duplicate values
+#clist = list(dfcol['label'])
+#
+#hh = {}
+#for c in clist:
+#    if c in hh.keys():
+#        hh[c] += 1
+#    else:
+#        hh[c] = 1
+## could write first bit as dict / list comp
+#dups = [k for (k,v) in hh.items() if v > 1]
+#dups = sorted(dups)
+#
+#dc = list(dfcol['label2'])
+#dg = list(filter(lambda s: s.startswith(dups[0]), dc))
+#dt = dftrain[dg]  # not identical but within 3-4 places
 
 
