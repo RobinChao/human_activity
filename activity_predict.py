@@ -3,7 +3,6 @@
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from functools import reduce
-from itertools import groupby
 import os
 import re
 
@@ -58,44 +57,50 @@ def parseColumn(ss):
 # tt = parseColumn(ss)
 # print('tt', tt)
 
+def check_duplicate_columns(dups, dfcol):
+    '''check duplicate columns'''
+    print("DUPS")
+    dc = dfcol['label2']
+    for dup in dups:
+        dg = list(filter(lambda s: s.startswith(dup), dc))
+        dt = dftrain[dg]
+        print("dt dup %s mean" % dup)
+        print(dt.mean())
+# values, mean are close but not identical, within 3-4 places
+
 def readRawColumns():
     '''read raw data columns'''
     feature_file = datadir + "features.txt"
     dfcol = pd.read_csv(feature_file, sep='\s+', header=None, index_col=0)
     dfcol.columns=['label']
-    print('dfcol\n', dfcol)
     
     dfcol['label'] = dfcol['label'].apply(lambda s: parseColumn(s))
-    dfcol['label2'] = dfcol.index
-    dfcol['label2'] = dfcol['label'] + \
-        dfcol['label2'].apply(lambda i: '_' + str(i))
-    # label2 column guaranteed to be unique
-    print('dfcol\n', dfcol)
-    print("dfcol2", dfcol['label2'][:5])
     
-    # really what I ought to do is create unique labels
-    # only for duplicate column names, not _str(i)
-    
-    print('dfcol shape',dfcol.shape)
-    # for i in range(dfcol.shape[0]//2):
-    #     print(dfcol['label'][i+1+dfcol.shape[0]//2])
+    # make unique column names, assign to label2
+    hh = {}
+    dlist = []
+    for c in dfcol['label']:
+        if c in hh.keys():
+            hh[c] += 1
+            dlist.append(c + '_' + str(hh[c]))
+        else:
+            hh[c] = 0
+            dlist.append(c)
+    dfcol['label2'] = dlist
+
+    print('dfcol\n', dfcol[:5])    
+    print('dfcol shape', dfcol.shape)
     clist = list(dfcol['label'])
     
     print('head clist', len(clist), clist[:5])  # 561
     cset = set(clist)
     print('head cset', len(cset), list(cset)[:5])  # 469
     print('done')
-    
-    # read in whole dataframe before removing duplicate columns?
-    # count duplicates, rename w/ counter, check if columns equal?
-    # 561 - 469 = 92 duplicates
-    
-    # cc = []
-    # for c in clist:
-    #     cc.append( clist.count(c) )
-    # cc = list(map(lambda c: clist.count(c), clist))
-    # print('cc', cc[:5])
-    # print('clist', len(clist), clist)
+
+    # check duplicate columns    
+    dups = [k for (k,v) in hh.items() if v > 1]
+    dups = sorted(dups)
+    check_duplicate_columns(dups, dfcol)
     
     return dfcol
 
@@ -177,61 +182,10 @@ dfact = readActivityLabels()
 dftrain, dftrain_y = readRawTrainData(dfcol)
 dftest, dftest_y = readRawTestData(dfcol)
 
-#print("dftest tAccMagMean head", dftest['tAccMag_Mean_201'][:5])
-#print("dftest fAccMagMean head", dftest['fAccMag_Mean_503'][:5])
-#print("dftrain tAccMagMean head", dftrain['tAccMag_Mean_201'][:5])
-#print("dftrain fAccMagMean head", dftrain['fAccMag_Mean_503'][:5])
-#print("dftrain tGyroMag_Mean head", dftrain['tGyroMag_Mean_240'][:5])
-#print("dftrain fBGyroMag_Mean head", dftrain['fBGyroMag_Mean_529'][:5])
-
-dftrain['tAccMag_Mean_201'].hist(by=dftrain_y['activity'])
-dftrain['fAccMag_Mean_503'].hist(by=dftrain_y['activity'])
-dftrain['tGyroMag_Mean_240'].hist(by=dftrain_y['activity'])
-dftrain['fBGyroMag_Mean_529'].hist(by=dftrain_y['activity'])
-
-# compare columns, check if duplicate names have duplicate values
-clist = list(dfcol['label'])
-print('clist', len(clist), clist[:5])
-
-# test duplicate columns
-def test_duplicate_columns(dfcol):
-    # compare columns, check if duplicate names have duplicate values
-    clist = list(dfcol['label'])
-    hh = {}
-    for c in clist:
-        if c in hh.keys():
-            hh[c] += 1
-        else:
-            hh[c] = 1
-    # could write first bit as dict / list comp
-    dups = [k for (k,v) in hh.items() if v > 1]
-    dups = sorted(dups)
-    
-    print("DUPS")
-    dc = list(dfcol['label2'])
-    for dup in dups:
-        dg = list(filter(lambda s: s.startswith(dup), dc))
-        dt = dftrain[dg]
-        print("dt dup %s mean" % dup)
-        print(dt.mean())
-    # values, mean are close but not identical
-
-test_duplicate_columns(dfcol)
-# I suppose the question is not are they identical,
-# but how to eliminate some columns that contain nearly
-# the same information, that do not contribute to analysis
-
-# new column names
-hh = {}
-dlist = []
-for c in clist:
-    if c in hh.keys():
-        hh[c] += 1
-        dlist.append(c + '_' + str(hh[c]))
-    else:
-        hh[c] = 0
-        dlist.append(c)
-dfcol['label3'] = dlist
+dftrain['tAccMag_Mean'].hist(by=dftrain_y['activity'])
+dftrain['fAccMag_Mean'].hist(by=dftrain_y['activity'])
+dftrain['tGyroMag_Mean'].hist(by=dftrain_y['activity'])
+dftrain['fBGyroMag_Mean'].hist(by=dftrain_y['activity'])
 
 # try different random forest parameters
 # try different data cleaning versions
@@ -263,22 +217,5 @@ impcol = getImportantColumns(dfcol, imp, 0.01)
 # score 0.896
 
 # score almost unchanged, maybe 0.5 to 1.0 %
-
-## compare columns, check if duplicate names have duplicate values
-#clist = list(dfcol['label'])
-#
-#hh = {}
-#for c in clist:
-#    if c in hh.keys():
-#        hh[c] += 1
-#    else:
-#        hh[c] = 1
-## could write first bit as dict / list comp
-#dups = [k for (k,v) in hh.items() if v > 1]
-#dups = sorted(dups)
-#
-#dc = list(dfcol['label2'])
-#dg = list(filter(lambda s: s.startswith(dups[0]), dc))
-#dt = dftrain[dg]  # not identical but within 3-4 places
 
 
