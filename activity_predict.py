@@ -14,8 +14,8 @@ def parseColumn(ss):
     pat2 = re.compile('(.*)(\d+),(\d+)')
     pat3 = re.compile('(.*)([XYZ]),([XYZ1234])')
     pat4 = re.compile('[-]')
-#    pat5 = re.compile('(Body|Mag|,)')  # 469
-    pat5 = re.compile('(Body|,)')    # 477
+    pat5 = re.compile('(Body|Mag|,)')  # 469
+#    pat5 = re.compile('(Body|,)')    # 477
     
     def splitJoin(pat, s):
         t = re.split(pat, s)
@@ -35,7 +35,7 @@ def parseColumn(ss):
     tt = splitJoin(pat3, tt)
     tt = re.sub(pat4, '_', tt)
     tt = tt.replace('BodyBody', 'BBody')
-    tt = re.sub(pat5, '', tt)  # removal chnages dup count to 477
+    tt = re.sub(pat5, '', tt)  # removal changes dup count to 477
     tt = tt.replace('mean','Mean')
     tt = tt.replace('std','Std')
     tt = tt.replace('gravity','_gravity')
@@ -56,17 +56,6 @@ def parseColumn(ss):
 
 # tt = parseColumn(ss)
 # print('tt', tt)
-
-def check_duplicate_columns(dups, dfcol):
-    '''check duplicate columns'''
-    print("DUPS")
-    dc = dfcol['label2']
-    for dup in dups:
-        dg = list(filter(lambda s: s.startswith(dup), dc))
-        dt = dftrain[dg]
-        print("dt dup %s mean" % dup)
-        print(dt.mean())
-# values, mean are close but not identical, within 3-4 places
 
 def readRawColumns():
     '''read raw data columns'''
@@ -90,19 +79,18 @@ def readRawColumns():
 
     print('dfcol\n', dfcol[:5])    
     print('dfcol shape', dfcol.shape)
-    clist = list(dfcol['label'])
     
-    print('head clist', len(clist), clist[:5])  # 561
-    cset = set(clist)
-    print('head cset', len(cset), list(cset)[:5])  # 469
-    print('done')
+#    clist = list(dfcol['label'])
+#    print('head clist', len(clist), clist[:5])  # 561
+#    cset = set(clist)
+#    print('head cset', len(cset), list(cset)[:5])  # 469
+#    print('done')
 
     # check duplicate columns    
     dups = [k for (k,v) in hh.items() if v > 1]
     dups = sorted(dups)
-    check_duplicate_columns(dups, dfcol)
     
-    return dfcol
+    return dfcol, dups
 
 def readActivityLabels():
     '''read activity labels'''
@@ -141,6 +129,30 @@ def readRawTestData(dfcol):
     print("dftest_y shape", dftest_y.shape, "head\n", dftest_y[:5])
     return dftest, dftest_y
 
+def check_duplicate_columns(dfcol, dups):
+    '''check duplicate columns'''
+    print("DUPS, len =", len(dups))
+    for dup in dups:
+        dg = list(filter(lambda s: s.startswith(dup), \
+            dfcol['label2']))
+        dt = dftrain[dg]
+        print("dt dup %s mean" % dup)
+        print(dt.mean())
+# values, mean are close but not identical, within 3-4 places
+
+# removeDuplicateColumns(dfcol, dups, dftrain):
+# removeDuplicateColumns(dfcol, dups, dftest):
+
+def findDuplicateColumns(dfcol, dups):
+    '''find duplicate columns to remove from dataframe'''
+# rewrite as map or list comp
+    dg = []
+    for dup in dups:
+        dg.extend( list(filter(lambda s: s.startswith(dup+"_"), \
+            dfcol['label2'])) )
+#    print("dg", len(dg), dg)
+    return dg
+
 def rfFitScore(clf, dftrain, dftest):
     '''random forest classifier fit and score.
        clf=RandomForestClassifier, dftrain=train data,
@@ -149,7 +161,7 @@ def rfFitScore(clf, dftrain, dftest):
     clfit = clf.fit(dftrain, dftrain_y['Y'])  # clf.fit(X, y)
     
     imp = clfit.feature_importances_  # ndarray of 562
-    print("importances", imp.shape, "\n", imp[:12], "\n...\n", imp[-12:])
+#    print("importances", imp.shape, "\n", imp[:12], "\n...\n", imp[-12:])
     print("sorted imps\n", (sorted(imp))[-20:])   
     
     # clfit.fit_transform( X, y=None )  # returns X_new
@@ -177,20 +189,23 @@ def rfFitScore(clf, dftrain, dftest):
     print("cross table:\n", ptab)
     return test_score, imp
 
-dfcol = readRawColumns()
+dfcol, dups = readRawColumns()
 dfact = readActivityLabels()
 dftrain, dftrain_y = readRawTrainData(dfcol)
 dftest, dftest_y = readRawTestData(dfcol)
 
-dftrain['tAccMag_Mean'].hist(by=dftrain_y['activity'])
-dftrain['fAccMag_Mean'].hist(by=dftrain_y['activity'])
-dftrain['tGyroMag_Mean'].hist(by=dftrain_y['activity'])
-dftrain['fBGyroMag_Mean'].hist(by=dftrain_y['activity'])
+# first analysis: keep all columns
+
+dftrain['tAcc_Mean'].hist(by=dftrain_y['activity'])
+dftrain['fAcc_Mean'].hist(by=dftrain_y['activity'])
+dftrain['tGyro_Mean'].hist(by=dftrain_y['activity'])
+dftrain['fBGyro_Mean'].hist(by=dftrain_y['activity'])
 
 # try different random forest parameters
 # try different data cleaning versions
 clf = RandomForestClassifier(n_estimators=10)
 score, imp = rfFitScore(clf, dftrain, dftest)
+# score .916
 
 def getImportantColumns(dfcol, imp, level=0.01):
     '''sort column names by RandomForest importance
@@ -217,5 +232,16 @@ impcol = getImportantColumns(dfcol, imp, 0.01)
 # score 0.896
 
 # score almost unchanged, maybe 0.5 to 1.0 %
+
+# second analysis: remove columns w/ duplicate names
+print("\nRemove columns with duplicate names")
+# check_duplicate_columns(dfcol, dups)
+dg = findDuplicateColumns(dfcol, dups)
+print("old dftrain, dftest shape", dftrain.shape, dftest.shape)
+dftrain = dftrain.drop(dg, axis=1)
+dftest = dftest.drop(dg, axis=1)
+print("new dftrain, dftest shape", dftrain.shape, dftest.shape)
+score, imp = rfFitScore(clf, dftrain, dftest)
+# score .903, slightly worse
 
 
