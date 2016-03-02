@@ -1,2 +1,3 @@
 .spyderworkspace
 data/
+__pycache__/

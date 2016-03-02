@@ -56,7 +56,7 @@ def parseColumn(ss):
 # tt = parseColumn(ss)
 # print('tt', tt)
 
-def readRawColumns():
+def readRawColumns(printOut=False):
     '''read raw data columns'''
     feature_file = datadir + "features.txt"
     dfcol = pd.read_csv(feature_file, sep='\s+', header=None, index_col=0)
@@ -76,8 +76,9 @@ def readRawColumns():
             dlist.append(c)
     dfcol['label2'] = dlist
 
-    print('dfcol\n', dfcol[:5])    
-    print('dfcol shape', dfcol.shape)
+    if (printOut==True):
+        print('dfcol\n', dfcol[:5])    
+        print('dfcol shape', dfcol.shape)
 
     # check duplicate columns    
     dups = [k for (k,v) in hh.items() if v > 1]
@@ -90,10 +91,9 @@ def readActivityLabels():
     dfact = pd.read_table(datadir + "activity_labels.txt", \
         sep='\s+', header=None, index_col=0)
     dfact.columns=['act']
-    print("dfact\n", dfact)
     return dfact
 
-def readRawTrainData(dfcol, dfact):
+def readRawTrainData(dfcol, dfact, printOut=False):
     '''read in raw train data'''
     traindir = datadir + "train/"
     dftrain = pd.read_table(traindir + "X_train.txt", \
@@ -104,11 +104,12 @@ def readRawTrainData(dfcol, dfact):
         sep='\s+', header=None, names=['Y'])
     dftrain_y['activity'] = dftrain_y['Y'].apply(lambda x: \
         dfact['act'][dfact.index[x-1]])
-    print("dftrain head\n", dftrain[:5])
-    print("dftrain_y shape", dftrain_y.shape, "head\n", dftrain_y[295:305])
+    if (printOut==True):
+        print("dftrain head\n", dftrain[:5])
+        print("dftrain_y shape", dftrain_y.shape, "head\n", dftrain_y[295:305])
     return dftrain, dftrain_y
 
-def readRawTestData(dfcol, dfact):
+def readRawTestData(dfcol, dfact, printOut=False):
     testdir = datadir + "test/"
     dftest = pd.read_table(testdir + "X_test.txt", \
         sep='\s+', header=None, names=dfcol['label2'])
@@ -118,8 +119,9 @@ def readRawTestData(dfcol, dfact):
         sep='\s+', header=None, names=['Y'])
     dftest_y['activity'] = dftest_y['Y'].apply(lambda x: \
         dfact['act'][dfact.index[x-1]])
-    print("dftest head", dftest.shape, "\n", dftest[:5])
-    print("dftest_y shape", dftest_y.shape, "head\n", dftest_y[:5])
+    if (printOut==True):
+        print("dftest head", dftest.shape, "\n", dftest[:5])
+        print("dftest_y shape", dftest_y.shape, "head\n", dftest_y[:5])
     return dftest, dftest_y
 
 def check_duplicate_columns(dfcol, dups):
@@ -135,28 +137,31 @@ def check_duplicate_columns(dfcol, dups):
 
 def removeDuplicateColumns(dfcol, dups, dftrain, dftest):
     '''find duplicate columns to remove from dataframe'''
-# rewrite as map or list comp
-    dg = []
-    for dup in dups:
-        dg.extend( list(filter(lambda s: s.startswith(dup+"_"), \
-            dfcol['label2'])) )
+#    dg = []
+#    for dup in dups:
+#        dg.extend( list(filter(lambda s: s.startswith(dup+"_"), \
+#            dfcol['label2'])) )
+    dg = list(map(lambda dup: list(filter(lambda s: \
+        s.startswith(dup+"_"), dfcol['label2'])), dups))
+#    dg = [ list(filter(lambda s: s.startswith(dup+"_"), \
+#            dfcol['label2'])) for dup in dups ]
+    dg = [item for sublist in dg for item in sublist]
 #    print("dg", len(dg), dg)
-    print("old dftrain, dftest shape", dftrain.shape, dftest.shape)
     dftrain = dftrain.drop(dg, axis=1)
     dftest = dftest.drop(dg, axis=1)
-    print("new dftrain, dftest shape", dftrain.shape, dftest.shape)
     return dftrain, dftest
 
-def rfFitScore(clf, dftrain, dftest):
+def rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y):
     '''random forest classifier fit and score.
        clf=RandomForestClassifier, dftrain=train data,
-       dftest=test data'''
+       dftrain_y=train data Y, dftest=test data,
+       dftest_y=test data Y'''
     
     clfit = clf.fit(dftrain, dftrain_y['Y'])  # clf.fit(X, y)
     
     imp = clfit.feature_importances_  # ndarray of 562
 #    print("importances", imp.shape, "\n", imp[:12], "\n...\n", imp[-12:])
-    print("sorted imps\n", (sorted(imp))[-20:])   
+#    print("sorted imps\n", (sorted(imp))[-20:])
     
     # clfit.fit_transform( X, y=None )  # returns X_new
     
@@ -175,7 +180,7 @@ def rfFitScore(clf, dftrain, dftest):
     
     new_p = clfit.predict_proba( dftest )
     # probability of each X variable to predict each y class
-    print("test predict probabilities head:\n", new_p[:12])
+    print("test predict probabilities head:\n", new_p[:5])
     
     # cross table of variable predictions
     ptab = pd.crosstab(dftest_y['Y'], new_y, \
@@ -190,10 +195,10 @@ def getImportantColumns(dfcol, imp, level=0.01):
     cilist = list(filter(lambda e: e[0] > level, cslist))
     return list(map(lambda e: e[1], cilist))
 
-def readRawData(dfcol):
+def readRawData(dfcol, printOut=False):
     dfact = readActivityLabels()
-    dftrain, dftrain_y = readRawTrainData(dfcol, dfact)
-    dftest, dftest_y = readRawTestData(dfcol, dfact)
+    dftrain, dftrain_y = readRawTrainData(dfcol, dfact, printOut)
+    dftest, dftest_y = readRawTestData(dfcol, dfact, printOut)
     return dftrain, dftrain_y, dftest, dftest_y
 
 def plotHistograms(dftrain, dftrain_y):
@@ -202,19 +207,20 @@ def plotHistograms(dftrain, dftrain_y):
         dftrain[label].hist(by=dftrain_y['activity'])
         # plot to file instead
 
-dfcol, dups = readRawColumns()
-dftrain, dftrain_y, dftest, dftest_y = readRawData(dfcol)
-
-plotHistograms(dftrain, dftrain_y)
-
-# first analysis: remove columns w/ duplicate names
-print("\nRemove columns with duplicate names")
-dftrain, dftest = removeDuplicateColumns(dfcol, dups, dftrain, dftest)
-
-# check that random forest works
-clf = RandomForestClassifier(n_estimators=10)
-score, imp = rfFitScore(clf, dftrain, dftest)
-impcol = getImportantColumns(dfcol, imp, 0.01)
+if __name__ == '__main__':
+    dfcol, dups = readRawColumns(printOut=True)
+    dftrain, dftrain_y, dftest, dftest_y = readRawData(dfcol, printOut=True)
+    
+    plotHistograms(dftrain, dftrain_y)
+    
+    # first analysis: remove columns w/ duplicate names
+    print("\nRemove columns with duplicate names")
+    dftrain, dftest = removeDuplicateColumns(dfcol, dups, dftrain, dftest)
+    
+    # check that random forest works
+    clf = RandomForestClassifier(n_estimators=10)
+    score, imp = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
+    impcol = getImportantColumns(dfcol, imp, 0.01)
 
 # score .903
 # Cross table shows ~10 percent covariance within
