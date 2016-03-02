@@ -3,7 +3,6 @@
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from functools import reduce
-import os
 import re
 
 datadir = "data/UCI_HAR_Dataset/"
@@ -79,12 +78,6 @@ def readRawColumns():
 
     print('dfcol\n', dfcol[:5])    
     print('dfcol shape', dfcol.shape)
-    
-#    clist = list(dfcol['label'])
-#    print('head clist', len(clist), clist[:5])  # 561
-#    cset = set(clist)
-#    print('head cset', len(cset), list(cset)[:5])  # 469
-#    print('done')
 
     # check duplicate columns    
     dups = [k for (k,v) in hh.items() if v > 1]
@@ -100,7 +93,7 @@ def readActivityLabels():
     print("dfact\n", dfact)
     return dfact
 
-def readRawTrainData(dfcol):
+def readRawTrainData(dfcol, dfact):
     '''read in raw train data'''
     traindir = datadir + "train/"
     dftrain = pd.read_table(traindir + "X_train.txt", \
@@ -115,7 +108,7 @@ def readRawTrainData(dfcol):
     print("dftrain_y shape", dftrain_y.shape, "head\n", dftrain_y[295:305])
     return dftrain, dftrain_y
 
-def readRawTestData(dfcol):
+def readRawTestData(dfcol, dfact):
     testdir = datadir + "test/"
     dftest = pd.read_table(testdir + "X_test.txt", \
         sep='\s+', header=None, names=dfcol['label2'])
@@ -140,10 +133,7 @@ def check_duplicate_columns(dfcol, dups):
         print(dt.mean())
 # values, mean are close but not identical, within 3-4 places
 
-# removeDuplicateColumns(dfcol, dups, dftrain):
-# removeDuplicateColumns(dfcol, dups, dftest):
-
-def findDuplicateColumns(dfcol, dups):
+def removeDuplicateColumns(dfcol, dups, dftrain, dftest):
     '''find duplicate columns to remove from dataframe'''
 # rewrite as map or list comp
     dg = []
@@ -151,7 +141,11 @@ def findDuplicateColumns(dfcol, dups):
         dg.extend( list(filter(lambda s: s.startswith(dup+"_"), \
             dfcol['label2'])) )
 #    print("dg", len(dg), dg)
-    return dg
+    print("old dftrain, dftest shape", dftrain.shape, dftest.shape)
+    dftrain = dftrain.drop(dg, axis=1)
+    dftest = dftest.drop(dg, axis=1)
+    print("new dftrain, dftest shape", dftrain.shape, dftest.shape)
+    return dftrain, dftest
 
 def rfFitScore(clf, dftrain, dftest):
     '''random forest classifier fit and score.
@@ -189,24 +183,6 @@ def rfFitScore(clf, dftrain, dftest):
     print("cross table:\n", ptab)
     return test_score, imp
 
-dfcol, dups = readRawColumns()
-dfact = readActivityLabels()
-dftrain, dftrain_y = readRawTrainData(dfcol)
-dftest, dftest_y = readRawTestData(dfcol)
-
-# first analysis: keep all columns
-
-dftrain['tAcc_Mean'].hist(by=dftrain_y['activity'])
-dftrain['fAcc_Mean'].hist(by=dftrain_y['activity'])
-dftrain['tGyro_Mean'].hist(by=dftrain_y['activity'])
-dftrain['fBGyro_Mean'].hist(by=dftrain_y['activity'])
-
-# try different random forest parameters
-# try different data cleaning versions
-clf = RandomForestClassifier(n_estimators=10)
-score, imp = rfFitScore(clf, dftrain, dftest)
-# score .916
-
 def getImportantColumns(dfcol, imp, level=0.01):
     '''sort column names by RandomForest importance
        for use in dftrain, dftest subset'''
@@ -214,34 +190,38 @@ def getImportantColumns(dfcol, imp, level=0.01):
     cilist = list(filter(lambda e: e[0] > level, cslist))
     return list(map(lambda e: e[1], cilist))
 
-impcol = getImportantColumns(dfcol, imp, 0.01)
+def readRawData(dfcol):
+    dfact = readActivityLabels()
+    dftrain, dftrain_y = readRawTrainData(dfcol, dfact)
+    dftest, dftest_y = readRawTestData(dfcol, dfact)
+    return dftrain, dftrain_y, dftest, dftest_y
 
-# score 0.901
+def plotHistograms(dftrain, dftrain_y):
+    labels = ['tAcc_Mean', 'fAcc_Mean', 'tGyro_Mean', 'fBGyro_Mean']
+    for label in labels:
+        dftrain[label].hist(by=dftrain_y['activity'])
+        # plot to file instead
+
+dfcol, dups = readRawColumns()
+
+dftrain, dftrain_y, dftest, dftest_y = readRawData(dfcol)
+
+plotHistograms(dftrain, dftrain_y)
+
+# first analysis: remove columns w/ duplicate names
+print("\nRemove columns with duplicate names")
+dftrain, dftest = removeDuplicateColumns(dfcol, dups, dftrain, dftest)
+
+# check that random forest works
+clf = RandomForestClassifier(n_estimators=10)
+score, imp = rfFitScore(clf, dftrain, dftest)
+# score .903
 # Cross table shows ~10 percent covariance within
 #   sedentary activities (LAYING SITTING STANDING)
 #   and within active activities (WALKING UPSTAIRS DOWNSTAIRS),
 #   but almost no covariance between active and 
 #   sedentary activities.
 
-# clf = RandomForestClassifier(n_estimators=20)
-# rfFitScore(clf, dftrain, dftest)
-# score 0.913
-
-# clf = RandomForestClassifier(n_estimators=5)
-# rfFitScore(clf, dftrain, dftest)
-# score 0.896
-
-# score almost unchanged, maybe 0.5 to 1.0 %
-
-# second analysis: remove columns w/ duplicate names
-print("\nRemove columns with duplicate names")
-# check_duplicate_columns(dfcol, dups)
-dg = findDuplicateColumns(dfcol, dups)
-print("old dftrain, dftest shape", dftrain.shape, dftest.shape)
-dftrain = dftrain.drop(dg, axis=1)
-dftest = dftest.drop(dg, axis=1)
-print("new dftrain, dftest shape", dftrain.shape, dftest.shape)
-score, imp = rfFitScore(clf, dftrain, dftest)
-# score .903, slightly worse
+impcol = getImportantColumns(dfcol, imp, 0.01)
 
 
