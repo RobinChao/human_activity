@@ -188,12 +188,11 @@ def rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y):
     print("cross table:\n", ptab)
     return test_score, imp
 
-def getImportantColumns(dfcol, imp, level=0.01):
+def getImportantColumns(dfcol, imp):
     '''sort column names by RandomForest importance
        for use in dftrain, dftest subset'''
     cslist = sorted(zip(imp, list(dfcol['label2'])), reverse=True)
-    cilist = list(filter(lambda e: e[0] > level, cslist))
-    return list(map(lambda e: e[1], cilist))
+    return cslist
 
 def readRawData(dfcol, printOut=False):
     dfact = readActivityLabels()
@@ -220,7 +219,7 @@ if __name__ == '__main__':
     # check that random forest works
     clf = RandomForestClassifier(n_estimators=10)
     score, imp = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
-    impcol = getImportantColumns(dfcol, imp, 0.01)
+    impcol = getImportantColumns(dfcol, imp)
 
 # score .903
 # Cross table shows ~10 percent covariance within
