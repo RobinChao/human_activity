@@ -203,7 +203,6 @@ def plotHistograms(dftrain, dftrain_y):
         # plot to file instead
 
 dfcol, dups = readRawColumns()
-
 dftrain, dftrain_y, dftest, dftest_y = readRawData(dfcol)
 
 plotHistograms(dftrain, dftrain_y)
@@ -215,13 +214,13 @@ dftrain, dftest = removeDuplicateColumns(dfcol, dups, dftrain, dftest)
 # check that random forest works
 clf = RandomForestClassifier(n_estimators=10)
 score, imp = rfFitScore(clf, dftrain, dftest)
+impcol = getImportantColumns(dfcol, imp, 0.01)
+
 # score .903
 # Cross table shows ~10 percent covariance within
 #   sedentary activities (LAYING SITTING STANDING)
 #   and within active activities (WALKING UPSTAIRS DOWNSTAIRS),
 #   but almost no covariance between active and 
 #   sedentary activities.
-
-impcol = getImportantColumns(dfcol, imp, 0.01)
 
 
