@@ -162,6 +162,7 @@ def rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y):
     imp = clfit.feature_importances_  # ndarray of 562
 #    print("importances", imp.shape, "\n", imp[:12], "\n...\n", imp[-12:])
 #    print("sorted imps\n", (sorted(imp))[-20:])
+#    print("clfit params", clfit.get_params)
     
     # clfit.fit_transform( X, y=None )  # returns X_new
     
@@ -228,4 +229,23 @@ if __name__ == '__main__':
 #   but almost no covariance between active and 
 #   sedentary activities.
 
+#    split training set into train, validate
+#    dfvalid = dftrain[dftrain['subject'] > 25]
+#    dftrain = dftrain[dftrain['subject'] <= 25]
+
+#   fit, rank features by importance
+    clf = RandomForestClassifier(n_estimators=100)  # real test 500
+    score, imp = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
+    impcol = getImportantColumns(dfcol, imp)
+    print("Top ten important columns:\n", impcol[:10])
+    
+    # how do I know true/false positives, true/false negatives?
+    # to calculate precision, recall?
+    
+# some thoughts: train, validate, test
+# validate excluded from train, used to select between different models
+# once a model is selected, use test to test
+# priors? check distribution of activities in train, test => 1/6 ?
+# get oob from fit, must set beforehand?
+# model after training is dftrain w/ top 10 or 20 importances?
 
