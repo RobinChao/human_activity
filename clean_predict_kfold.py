@@ -3,7 +3,7 @@
 # predict human activity after reading and cleaning data
 # use KFold cross validation
 
-import pandas as pd
+#import pandas as pd
 #from functools import reduce
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.cross_validation import KFold
@@ -11,13 +11,13 @@ from sklearn.cross_validation import KFold
 from read_clean_data import readRawColumns, readRawData, \
     removeDuplicateColumns, rfFitScore, getImportantColumns
 
-print("ya haa")
+print("random forest, kfold 4")
 
 dfcol, dups = readRawColumns()
 dftrain, dftrain_y, dftest, dftest_y = readRawData(dfcol)
 dftrain, dftest = removeDuplicateColumns(dfcol, dups, dftrain, dftest)
 
-clf = RandomForestClassifier(n_estimators=100)  # 500 for real test
+clf = RandomForestClassifier(n_estimators=100)
 
 print("dftrain shape", dftrain.shape)
 
@@ -50,6 +50,5 @@ print("total score", total_score)
 #score, imp = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
 impcol = getImportantColumns(dfcol, imps)
 print("importance column len", len(impcol))
-print("Top ten important scores and features:\n", impcol[:10])
+print("KFold: top ten important scores and features:\n", impcol[:10])
 
-print("yoo hoo")
