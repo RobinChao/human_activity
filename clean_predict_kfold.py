@@ -48,7 +48,7 @@ print("total score", total_score)
 
 #clf = RandomForestClassifier(n_estimators=10)
 #score, imp = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
-impcol = getImportantColumns(dfcol, imps)
+impcol = getImportantColumns(dftrain.columns, imps)
 print("importance column len", len(impcol))
 print("KFold: top ten important scores and features:\n", impcol[:10])
 

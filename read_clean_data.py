@@ -189,11 +189,12 @@ def rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y):
     print("cross table:\n", ptab)
     return test_score, imp
 
-def getImportantColumns(dfcol, imp):
+def getImportantColumns(dftraincol, imp):
     '''sort column names by RandomForest importance
        for use in dftrain, dftest subset'''
-    cslist = sorted(zip(imp, list(dfcol['label2'])), reverse=True)
-    return cslist
+#    cslist = sorted(zip(imp, list(dfcol['label2'])), reverse=True)
+#    return cslist
+    return sorted(zip(imp, dftraincol), reverse=True)
 
 def readRawData(dfcol, printOut=False):
     dfact = readActivityLabels()
@@ -216,11 +217,14 @@ if __name__ == '__main__':
     # first analysis: remove columns w/ duplicate names
     print("\nRemove columns with duplicate names")
     dftrain, dftest = removeDuplicateColumns(dfcol, dups, dftrain, dftest)
+    print("dftrain head", dftrain.shape, "\n", dftrain[:5])    
     
     # check that random forest works
+    print("Basic check")
     clf = RandomForestClassifier(n_estimators=10)
     score, imp = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
-    impcol = getImportantColumns(dfcol, imp)
+    impcol = getImportantColumns(dftrain.columns, imp)
+    print("Basic check: Top ten important columns:\n", impcol[:10])
 
 # score .903
 # Cross table shows ~10 percent covariance within
@@ -229,18 +233,63 @@ if __name__ == '__main__':
 #   but almost no covariance between active and 
 #   sedentary activities.
 
-#    split training set into train, validate
-#    dfvalid = dftrain[dftrain['subject'] > 25]
-#    dftrain = dftrain[dftrain['subject'] <= 25]
-
-#   fit, rank features by importance
-    clf = RandomForestClassifier(n_estimators=100)  # real test 500
+#   should give overfitting
+    print("Overfit")
+    clf = RandomForestClassifier(n_estimators=20)
+    score, imp = rfFitScore(clf, dftrain, dftrain_y, dftrain, dftrain_y)
+    impcol = getImportantColumns(dftrain.columns, imp)
+    print("Overfit: Top ten important columns:\n", impcol[:10])
+    
+    print("Test fit")
+    clf = RandomForestClassifier(n_estimators=100)
     score, imp = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
-    impcol = getImportantColumns(dfcol, imp)
-    print("Top ten important columns:\n", impcol[:10])
+    impcol = getImportantColumns(dftrain.columns, imp)
+    print("Test fit: Top ten important columns:\n", impcol[:10])
     
     # how do I know true/false positives, true/false negatives?
-    # to calculate precision, recall?
+    # to calculate precision, recall?  priors all equal, Y's 1/6?
+    # accuracy: percent labeled correctly
+    # precision: true positives / (true positives + true negatives)
+    # recall:   true positives / (true positives + false negatives)
+
+#    split training, test sets into train, validate, test
+#    use dftrain, dfvalid to find top ten columns => gives
+#       new model, new dftrain then dftest
+#    for real tests use 500 estimators
+    dftrain['Y'] = dftrain_y['Y']  # need to split test by subject
+    dftrain['activity'] = dftrain_y['activity']
+    dfvalid = dftrain[dftrain['subject'] > 25]
+    dftrain = dftrain[dftrain['subject'] <= 25]
+    dftrain_y = dftrain[['Y', 'activity']]
+    dfvalid_y = dfvalid[['Y', 'activity']]
+    dftrain = dftrain.drop(['Y', 'activity'], axis=1)
+    dfvalid = dfvalid.drop(['Y', 'activity'], axis=1)
+    
+#    print("validation: dftrain head", dftrain.shape, "\n", dftrain[:5])
+#    print("validation: dfvalid head", dfvalid.shape, "\n", dfvalid[:5])
+#    print("validation: dftrain_y head", dftrain_y.shape, "\n", dftrain_y[:5])
+#    print("validation: dfvalid_y head", dfvalid_y.shape, "\n", dfvalid_y[:5])
+    
+    print("Validation fit")
+    clf = RandomForestClassifier(n_estimators=100)
+    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+    impcol = getImportantColumns(dftrain.columns, imp)
+#    sum(list(map(lambda e: e[0], impcol)))  # equals 1.0
+    print("Validation fit: Top twenty important columns:\n", impcol[:20])
+    # plot importances
+    
+    # top 10 ~ 60-70% accuracy, top 20 ~ 80% accuracy, better cross table
+    impcolnames = list(map(lambda e: e[1], impcol[:20]))
+    dftrain = dftrain[impcolnames]
+    dftest = dftest[impcolnames]
+#    print("validation: dftrain model head", dftrain.shape, "\n", \
+#        dftrain[:5], "\n", dftest[:5])
+    
+    print("Test model fit")
+    clf = RandomForestClassifier(n_estimators=100)
+    score, imp = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
+    impcol = getImportantColumns(dftrain.columns, imp)
+    print("Test model fit: Top ten important columns:\n", impcol[:10])
     
 # some thoughts: train, validate, test
 # validate excluded from train, used to select between different models
