@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import pandas as pd
+import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+import matplotlib.pyplot as plt
 from functools import reduce
+import os
 import re
 
 datadir = "data/UCI_HAR_Dataset/"
@@ -137,16 +140,9 @@ def check_duplicate_columns(dfcol, dups):
 
 def removeDuplicateColumns(dfcol, dups, dftrain, dftest):
     '''find duplicate columns to remove from dataframe'''
-#    dg = []
-#    for dup in dups:
-#        dg.extend( list(filter(lambda s: s.startswith(dup+"_"), \
-#            dfcol['label2'])) )
     dg = list(map(lambda dup: list(filter(lambda s: \
         s.startswith(dup+"_"), dfcol['label2'])), dups))
-#    dg = [ list(filter(lambda s: s.startswith(dup+"_"), \
-#            dfcol['label2'])) for dup in dups ]
     dg = [item for sublist in dg for item in sublist]
-#    print("dg", len(dg), dg)
     dftrain = dftrain.drop(dg, axis=1)
     dftest = dftest.drop(dg, axis=1)
     return dftrain, dftest
@@ -192,9 +188,39 @@ def rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y):
 def getImportantColumns(dftraincol, imp):
     '''sort column names by RandomForest importance
        for use in dftrain, dftest subset'''
-#    cslist = sorted(zip(imp, list(dfcol['label2'])), reverse=True)
-#    return cslist
     return sorted(zip(imp, dftraincol), reverse=True)
+
+def getPlotDir():
+    plotdir = "human_activity_plots/"
+    if not os.access(plotdir, os.F_OK):
+        os.mkdir(plotdir)
+    return plotdir
+
+def plotImportances(impcol, plotdir, label):
+    vals = list(map(lambda e: e[0], impcol))
+    valsum = np.cumsum(vals)
+    vals = vals / vals[0]     # norm
+    
+    plt.clf()
+    plt.plot(range(len(vals)), vals)
+    plt.plot(range(len(valsum)), valsum)
+    plt.xlabel("Feature Number")
+    plt.ylabel("Importance")
+    plt.title("Random Forest Importances")
+    plt.legend(('relative importance', 'cumulative importance'), \
+        loc='center right')
+    plt.savefig(plotdir + "impt_" + label)    
+    
+    plt.clf()
+    plt.plot(range(100), vals[:100])
+    plt.plot(range(100), valsum[:100])
+    plt.xlabel("Feature Number")
+    plt.ylabel("Importance")
+    plt.title("Random Forest Importances")
+    plt.legend(('relative importance', 'cumulative importance'), \
+        loc='upper center')
+    plt.text(70, 0.4, "First Hundred\nImportances")
+    plt.savefig(plotdir + "impt100_" + label)
 
 def readRawData(dfcol, printOut=False):
     dfact = readActivityLabels()
@@ -202,17 +228,21 @@ def readRawData(dfcol, printOut=False):
     dftest, dftest_y = readRawTestData(dfcol, dfact, printOut)
     return dftrain, dftrain_y, dftest, dftest_y
 
-def plotHistograms(dftrain, dftrain_y):
+def plotHistograms(dftrain, dftrain_y, plotdir):
     labels = ['tAcc_Mean', 'fAcc_Mean', 'tGyro_Mean', 'fBGyro_Mean']
     for label in labels:
+        plt.clf()
         dftrain[label].hist(by=dftrain_y['activity'])
+#        plt.title("Histogram of" + label + "by Activity")
+        plt.savefig(plotdir + "hist_" + label)
         # plot to file instead
 
 if __name__ == '__main__':
     dfcol, dups = readRawColumns(printOut=True)
     dftrain, dftrain_y, dftest, dftest_y = readRawData(dfcol, printOut=True)
     
-    plotHistograms(dftrain, dftrain_y)
+    plotdir = getPlotDir()
+    plotHistograms(dftrain, dftrain_y, plotdir)
     
     # first analysis: remove columns w/ duplicate names
     print("\nRemove columns with duplicate names")
@@ -279,6 +309,7 @@ if __name__ == '__main__':
 #    sum(list(map(lambda e: e[0], impcol)))  # equals 1.0
     print("Validation fit: Top twenty important columns:\n", impcol[:20])
     # plot importances
+    plotImportances(impcol, plotdir, "vfit")
     
     # top 10 ~ 60-70% accuracy, top 20 ~ 80% accuracy, better cross table
     impcolnames = list(map(lambda e: e[1], impcol[:20]))
@@ -290,10 +321,9 @@ if __name__ == '__main__':
     print("Test model fit")
     clf = RandomForestClassifier(n_estimators=100)
     score, imp = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
+    print("activity labels:", readActivityLabels())
     impcol = getImportantColumns(dftrain.columns, imp)
     print("Test model fit: Top ten important columns:\n", impcol[:10])
-    
-    # check number correct for each activity?  confusion table
     
 # some thoughts: train, validate, test
 # validate excluded from train, used to select between different models
@@ -301,4 +331,5 @@ if __name__ == '__main__':
 # priors? check distribution of activities in train, test => 1/6 ?
 # get oob from fit, must set beforehand?
 # model after training is dftrain w/ top 10 or 20 importances?
+
 
