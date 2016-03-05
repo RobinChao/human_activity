@@ -250,20 +250,22 @@ if __name__ == '__main__':
     # to calculate precision, recall?  priors all equal, Y's 1/6?
     # accuracy: percent labeled correctly
     # precision: true positives / (true positives + true negatives)
-    # recall:   true positives / (true positives + false negatives)
+    # recall:    true positives / (true positives + false negatives)
 
 #    split training, test sets into train, validate, test
 #    use dftrain, dfvalid to find top ten columns => gives
 #       new model, new dftrain then dftest
 #    for real tests use 500 estimators
-    dftrain['Y'] = dftrain_y['Y']  # need to split test by subject
-    dftrain['activity'] = dftrain_y['activity']
-    dfvalid = dftrain[dftrain['subject'] > 25]
-    dftrain = dftrain[dftrain['subject'] <= 25]
-    dftrain_y = dftrain[['Y', 'activity']]
-    dfvalid_y = dfvalid[['Y', 'activity']]
-    dftrain = dftrain.drop(['Y', 'activity'], axis=1)
-    dfvalid = dfvalid.drop(['Y', 'activity'], axis=1)
+
+# add subject to Y's for validation split
+    cutoff = 23
+    dftrain_y['subject'] = dftrain['subject']
+    dfvalid = dftrain[dftrain['subject'] > cutoff]
+    dftrain = dftrain[dftrain['subject'] <= cutoff]
+    dfvalid_y = dftrain_y[dftrain_y['subject'] > cutoff]
+    dftrain_y = dftrain_y[dftrain_y['subject'] <= cutoff]
+    dftrain_y = dftrain_y.drop(['subject'], axis=1)
+    dfvalid_y = dfvalid_y.drop(['subject'], axis=1)
     
 #    print("validation: dftrain head", dftrain.shape, "\n", dftrain[:5])
 #    print("validation: dfvalid head", dfvalid.shape, "\n", dfvalid[:5])
@@ -290,6 +292,8 @@ if __name__ == '__main__':
     score, imp = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
     impcol = getImportantColumns(dftrain.columns, imp)
     print("Test model fit: Top ten important columns:\n", impcol[:10])
+    
+    # check number correct for each activity?  confusion table
     
 # some thoughts: train, validate, test
 # validate excluded from train, used to select between different models
