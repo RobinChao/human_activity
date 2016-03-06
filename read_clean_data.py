@@ -3,6 +3,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import precision_recall_fscore_support as prfs
 import matplotlib.pyplot as plt
 from functools import reduce
 import os
@@ -189,6 +190,11 @@ def rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y):
     ptab = pd.crosstab(dftest_y['Y'], new_y, \
         rownames=['actual'], colnames=['predicted'])
     print("cross table:\n", ptab)
+    
+    precision, recall, fbeta, support = prfs(dftest_y['Y'], new_y)
+    print("precision", precision, "\nrecall", recall, \
+        "\nfbeta", fbeta, "\nsupport", support)
+    
     return test_score, imp
 
 def getImportantColumns(dftraincol, imp):
