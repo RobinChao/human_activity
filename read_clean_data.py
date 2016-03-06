@@ -127,6 +127,12 @@ def readRawTestData(dfcol, dfact, printOut=False):
         print("dftest_y shape", dftest_y.shape, "head\n", dftest_y[:5])
     return dftest, dftest_y
 
+def readRawData(dfcol, printOut=False):
+    dfact = readActivityLabels()
+    dftrain, dftrain_y = readRawTrainData(dfcol, dfact, printOut)
+    dftest, dftest_y = readRawTestData(dfcol, dfact, printOut)
+    return dftrain, dftrain_y, dftest, dftest_y
+
 def check_duplicate_columns(dfcol, dups):
     '''check duplicate columns'''
     print("DUPS, len =", len(dups))
@@ -204,6 +210,7 @@ def plotImportances(impcol, plotdir, label):
     plt.clf()
     plt.plot(range(len(vals)), vals)
     plt.plot(range(len(valsum)), valsum)
+    plt.ylim(0.0, 1.0)
     plt.xlabel("Feature Number")
     plt.ylabel("Importance")
     plt.title("Random Forest Importances")
@@ -214,28 +221,23 @@ def plotImportances(impcol, plotdir, label):
     plt.clf()
     plt.plot(range(100), vals[:100])
     plt.plot(range(100), valsum[:100])
+    plt.ylim(0.0, 1.0)
     plt.xlabel("Feature Number")
     plt.ylabel("Importance")
     plt.title("Random Forest Importances")
     plt.legend(('relative importance', 'cumulative importance'), \
         loc='upper center')
-    plt.text(70, 0.4, "First Hundred\nImportances")
+    plt.text(70, 0.35, "First Hundred\nImportances")
     plt.savefig(plotdir + "impt100_" + label)
-
-def readRawData(dfcol, printOut=False):
-    dfact = readActivityLabels()
-    dftrain, dftrain_y = readRawTrainData(dfcol, dfact, printOut)
-    dftest, dftest_y = readRawTestData(dfcol, dfact, printOut)
-    return dftrain, dftrain_y, dftest, dftest_y
 
 def plotHistograms(dftrain, dftrain_y, plotdir):
     labels = ['tAcc_Mean', 'fAcc_Mean', 'tGyro_Mean', 'fBGyro_Mean']
     for label in labels:
         plt.clf()
-        dftrain[label].hist(by=dftrain_y['activity'])
-#        plt.title("Histogram of" + label + "by Activity")
+        dftrain[label].hist(by=dftrain_y['activity'], \
+            sharex=True, xlabelsize=8, ylabelsize=8)
+        plt.text(-2.5, -170, "Histograms of " + label + " by Activity")
         plt.savefig(plotdir + "hist_" + label)
-        # plot to file instead
 
 if __name__ == '__main__':
     dfcol, dups = readRawColumns(printOut=True)
@@ -311,6 +313,7 @@ if __name__ == '__main__':
     # plot importances
     plotImportances(impcol, plotdir, "vfit")
     
+    # model after training: dftrain w/ top 10 or 20 importances?
     # top 10 ~ 60-70% accuracy, top 20 ~ 80% accuracy, better cross table
     impcolnames = list(map(lambda e: e[1], impcol[:20]))
     dftrain = dftrain[impcolnames]
@@ -328,8 +331,8 @@ if __name__ == '__main__':
 # some thoughts: train, validate, test
 # validate excluded from train, used to select between different models
 # once a model is selected, use test to test
-# priors? check distribution of activities in train, test => 1/6 ?
+# priors? check distribution of activities in train, test => 1/6
+#     from confusion matrix?
 # get oob from fit, must set beforehand?
-# model after training is dftrain w/ top 10 or 20 importances?
 
 
