@@ -311,7 +311,7 @@ if __name__ == '__main__':
 #    print("validation: dfvalid_y head", dfvalid_y.shape, "\n", dfvalid_y[:5])
     
     print("Validation fit")
-    clf = RandomForestClassifier(n_estimators=100)
+    clf = RandomForestClassifier(n_estimators=500)  # 100 or 500
     score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
     impcol = getImportantColumns(dftrain.columns, imp)
 #    sum(list(map(lambda e: e[0], impcol)))  # equals 1.0
