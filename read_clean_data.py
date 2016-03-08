@@ -166,13 +166,14 @@ def rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y):
 #    print("importances", imp.shape, "\n", imp[:12], "\n...\n", imp[-12:])
 #    print("sorted imps\n", (sorted(imp))[-20:])
 #    print("clfit params", clfit.get_params)
+#    sum(imp) == 1.0
     
     # clfit.fit_transform( X, y=None )  # returns X_new
     
     new_y = clfit.predict( dftest )  # returns predicted Y
     
     test_score = clfit.score( dftest, dftest_y['Y'] )
-    print("test score:", test_score)    
+    print("test score:", test_score, clfit.oob_score_)    
     
     # calculate test score by other means
     print("test predict True %.3f percent, %d out of %d" % \
@@ -191,6 +192,11 @@ def rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y):
         rownames=['actual'], colnames=['predicted'])
     print("cross table:\n", ptab)
     
+    # how does it know true/false positives, true/false negatives?
+    # priors all equal, Y's 1/6?  maybe from confusion matrix?
+    # accuracy: percent labeled correctly
+    # precision: true positives / (true positives + true negatives)
+    # recall:    true positives / (true positives + false negatives)
     precision, recall, fbeta, support = prfs(dftest_y['Y'], new_y)
     print("precision", precision, "\nrecall", recall, \
         "\nfbeta", fbeta, "\nsupport", support)
@@ -278,17 +284,11 @@ if __name__ == '__main__':
     impcol = getImportantColumns(dftrain.columns, imp)
     print("Overfit: Top ten important columns:\n", impcol[:10])
     
-    print("Test fit")
-    clf = RandomForestClassifier(n_estimators=100)
-    score, imp = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
-    impcol = getImportantColumns(dftrain.columns, imp)
-    print("Test fit: Top ten important columns:\n", impcol[:10])
-    
-    # how do I know true/false positives, true/false negatives?
-    # to calculate precision, recall?  priors all equal, Y's 1/6?
-    # accuracy: percent labeled correctly
-    # precision: true positives / (true positives + true negatives)
-    # recall:    true positives / (true positives + false negatives)
+#    print("Test fit")
+#    clf = RandomForestClassifier(n_estimators=100)
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("Test fit: Top ten important columns:\n", impcol[:10])
 
 #    split training, test sets into train, validate, test
 #    use dftrain, dfvalid to find top ten columns => gives
@@ -310,35 +310,174 @@ if __name__ == '__main__':
 #    print("validation: dftrain_y head", dftrain_y.shape, "\n", dftrain_y[:5])
 #    print("validation: dfvalid_y head", dfvalid_y.shape, "\n", dfvalid_y[:5])
     
-    print("Validation fit")
-    clf = RandomForestClassifier(n_estimators=500)  # 100 or 500
+    print("Validation n=100")
+    # vary n_estimators int, oob_score=True,False (n_features=478)
+    #   max_features=None,auto,sqrt,log2 # compare w/ n_features
+    clf = RandomForestClassifier(n_estimators=100)  # 100 or 500
     score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
     impcol = getImportantColumns(dftrain.columns, imp)
-#    sum(list(map(lambda e: e[0], impcol)))  # equals 1.0
-    print("Validation fit: Top twenty important columns:\n", impcol[:20])
-    # plot importances
-    plotImportances(impcol, plotdir, "vfit")
+    print("n=100 fit: top ten important columns:\n", impcol[:10])
+    plotImportances(impcol, plotdir, "v100")
+    # sccore 0.9068 0.9099 0.9094
     
-    # model after training: dftrain w/ top 10 or 20 importances?
-    # top 10 ~ 60-70% accuracy, top 20 ~ 80% accuracy, better cross table
-    impcolnames = list(map(lambda e: e[1], impcol[:20]))
-    dftrain = dftrain[impcolnames]
-    dftest = dftest[impcolnames]
-#    print("validation: dftrain model head", dftrain.shape, "\n", \
-#        dftrain[:5], "\n", dftest[:5])
+#    print("Validation n=100 auto")  # auto is sqrt for classifier
+#    clf = RandomForestClassifier(n_estimators=100, max_features='auto')
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("n=100 auto fit: top ten important columns:\n", impcol[:10])
+#    plotImportances(impcol, plotdir, "v100auto")
+#    # score 0.9051 0.9112 0.9077 0.9079
+#    
+#    print("Validation n=100 sqrt")  # sqrt(478) = 21.9
+#    clf = RandomForestClassifier(n_estimators=100, max_features='sqrt')
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("n=100 sqrt fit: top ten important columns:\n", impcol[:10])
+#    plotImportances(impcol, plotdir, "v100sqrt")
+#    # score 0.9081 0.9051 0.9143 0.9147
+#    
+#    print("Validation n=100 log2")  # log2(478) = 8.9
+#    clf = RandomForestClassifier(n_estimators=100, max_features='log2')
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("n=100 log2 fit: top ten important columns:\n", impcol[:10])
+#    plotImportances(impcol, plotdir, "v100log")  
+#    # score 0.9265 0.9300 0.9283 0.9278
+#    
+#    print("Validation n=100 9")
+#    clf = RandomForestClassifier(n_estimators=100, max_features=9)
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("n=100 log2 fit: top ten important columns:\n", impcol[:10])
+#    plotImportances(impcol, plotdir, "v100_9")  
+#    # score 0.9274 0.9287 0.9309
+#    
+#    print("Validation n=100 22")
+#    clf = RandomForestClassifier(n_estimators=100, max_features=22)
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("n=100 22 fit: top ten important columns:\n", impcol[:10])
+#    plotImportances(impcol, plotdir, "v100_22")  
+#    # score 0.9121 0.9059 0.9068
+#    
+#    print("Validation n=100 44")
+#    clf = RandomForestClassifier(n_estimators=100, max_features=44)
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("n=100 44 fit: top ten important columns:\n", impcol[:10])
+#    plotImportances(impcol, plotdir, "v100_44")
+#    # score 0.9042 0.9029 0.9051
+#    
+#    print("Validation n=100 100")
+#    clf = RandomForestClassifier(n_estimators=100, max_features=100)
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("n=100 100xx fit: top ten important columns:\n", impcol[:10])
+#    plotImportances(impcol, plotdir, "v100_xx")
+#    # score 0.8941 0.8976
+#    
+#    print("Validation n=100 15")
+#    clf = RandomForestClassifier(n_estimators=100, max_features=15)
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("n=100 15 fit: top ten important columns:\n", impcol[:10])
+#    plotImportances(impcol, plotdir, "v100_15")
+#    # score 0.9164 0.9134
+#    
+#    print("Validation n=100 6")
+#    clf = RandomForestClassifier(n_estimators=100, max_features=6)
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("n=100 6 fit: top ten important columns:\n", impcol[:10])
+#    plotImportances(impcol, plotdir, "v100_6")
+#    # score 0.9326 0.9357
+#    
+#    print("Validation n=50")
+#    clf = RandomForestClassifier(n_estimators=50)
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("n=50 fit: top ten important columns:\n", impcol[:10])
+#    plotImportances(impcol, plotdir, "vb0050")  # score 0.9073
+#    
+#    print("Validation n=200")
+#    clf = RandomForestClassifier(n_estimators=200)
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("n=200 fit: top ten important columns:\n", impcol[:10])
+#    plotImportances(impcol, plotdir, "vb0200")  # score 0.9068
+#    
+#    print("Validation n=500")
+#    clf = RandomForestClassifier(n_estimators=500)
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("n=500 fit: top ten important columns:\n", impcol[:10])
+#    plotImportances(impcol, plotdir, "vb500")  # score 0.9064
     
+#    print("Validation n=1000")
+#    clf = RandomForestClassifier(n_estimators=1000)
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("n=1000 fit: top ten important columns:\n", impcol[:10])
+#    plotImportances(impcol, plotdir, "vb1000")  # score 0.9094
+#    
+#    print("Validation n=2000")
+#    clf = RandomForestClassifier(n_estimators=2000)
+#    score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+#    impcol = getImportantColumns(dftrain.columns, imp)
+#    print("n=2000 fit: top ten important columns:\n", impcol[:10])
+#    plotImportances(impcol, plotdir, "vb2000")  # score 0.9077
+    
+    for i in list(range(4)):  # average of four
+        print("Validation n=100")
+        clf = RandomForestClassifier(n_estimators=100, oob_score=True)
+        score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+        impcol = getImportantColumns(dftrain.columns, imp)
+        print("n=100 fit: top ten important columns:\n", impcol[:10])
+        # score 0.9160 0.9143 0.9086 0.9077 => 0.912 +- 0.004
+        # score 0.9086 0.9073 0.9103 0.9077 => 0.908 +- 0.001
+        # np.mean, np.std
+        
+        print("Validation n=200")
+        clf = RandomForestClassifier(n_estimators=200, oob_score=True)
+        score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+        impcol = getImportantColumns(dftrain.columns, imp)
+        print("n=200 fit: top ten important columns:\n", impcol[:10])
+        # score 0.9077 0.9073 0.9099 0.9094 => 0.909 +- 0.001
+        # score 0.9068 0.9059 0.9112 0.9129 => 0.909 +- 0.003
+        
+        print("Validation n=500")
+        clf = RandomForestClassifier(n_estimators=500, oob_score=True)
+        score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
+        impcol = getImportantColumns(dftrain.columns, imp)
+        print("n=500 fit: top ten important columns:\n", impcol[:10])
+        # score 0.9112 0.9094 0.9086 0.9064 => 0.909 +- 0.002
+        # score 0.9077 0.9077 0.9081 0.9116 => 0.909 += 0.002
+    
+    # rather than limited number of columns, optimize other params
+    # in validation, then test chosen params with test
     print("Test model fit")
-    clf = RandomForestClassifier(n_estimators=100)
-    score, imp = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
-    print("activity labels:", readActivityLabels())
-    impcol = getImportantColumns(dftrain.columns, imp)
-    print("Test model fit: Top ten important columns:\n", impcol[:10])
+    for i in list(range(4)):  # average of four
+        clf = RandomForestClassifier(n_estimators=100, oob_score=True)
+        score, imp = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
+        print("activity labels:", readActivityLabels())
+        impcol = getImportantColumns(dftrain.columns, imp)
+        print("Test model fit: top ten important columns:\n", impcol[:10])
+        # score 0.9097 0.9155 0.9104 0.9057 => 0.910 +- 0.003
+        # score 0.9125 0.9162 0.9131 0.9125 => 0.914 +- 0.002
+
+# test model, for each class:
+# precision [ 0.82322357  0.88470067  0.96100279  0.88932039  0.93503937  1. ] 
+# recall [ 0.95766129  0.84713376  0.82142857  0.93279022  0.89285714  1. ]
+# precision [ 0.83478261  0.88546256  0.96368715  0.89264414  0.91923077  1. ] 
+# recall [ 0.96774194  0.85350318  0.82142857  0.91446029  0.89849624  1. ] 
+# precision [ 0.82817869  0.89309577  0.95786517  0.90618762  0.92911877  1. ] 
+# recall [ 0.97177419  0.85138004  0.81190476  0.92464358  0.91165414  1.  ] 
+# precision [ 0.81313131  0.91013825  0.95543175  0.89820359  0.92145594  1. ] 
+# recall [ 0.97379032  0.83864119  0.81666667  0.91649695  0.90413534  1. ] 
     
 # some thoughts: train, validate, test
 # validate excluded from train, used to select between different models
 # once a model is selected, use test to test
-# priors? check distribution of activities in train, test => 1/6
-#     from confusion matrix?
 # get oob from fit, must set beforehand?
 
 
