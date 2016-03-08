@@ -477,7 +477,6 @@ if __name__ == '__main__':
     for i in list(range(4)):  # average of four
         clf = RandomForestClassifier(n_estimators=100, oob_score=True)
         score, imp, oob = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
-        print("activity labels:", readActivityLabels())
         impcol = getImportantColumns(dftrain.columns, imp)
         print("Test model fit: top ten important columns:\n", impcol[:10])
         # score 0.9097 0.9155 0.9104 0.9057 => 0.910 +- 0.003
@@ -485,6 +484,7 @@ if __name__ == '__main__':
         scores.append(score)
         oobs.append(oob)
 
+    print("activity labels:", readActivityLabels())
     print("scores mean, std", np.mean(scores), np.std(scores))
     print("oobs mean, std", np.mean(oobs), np.std(oobs))
 #   scores mean, std 0.912114014252 0.00241137943732
