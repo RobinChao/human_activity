@@ -426,5 +426,7 @@ opt fit: top ten important columns:
  [(0.033668750288859073, 'x558'), (0.033585662495050447, 'x52'), (0.031654039692353579, 'x40'), (0.028071614189209004, 'x58'), (0.025672263935254836, 'x49'), (0.023503104900439439, 'x56'), (0.021157363027774032, 'x41'), (0.019980371440115188, 'x51'), (0.019946419859102806, 'x50'), (0.01683008755096934, 'x559')]
 Test scores mean, std 0.828246753247 0.0067983977379
 Test oobs mean, std 0.992053872054 0.000503926920778
+Top ten importances of last opt fit, by original name:
+ ['angle_X_gravityMean', 'tGravityAcc_min_X', 'tGravityAcc_Mean_X', 'tGravityAcc_energy_Z', 'tGravityAcc_max_X', 'tGravityAcc_energy_X', 'tGravityAcc_Mean_Y', 'tGravityAcc_max_Z', 'tGravityAcc_max_Y', 'angle_Y_gravityMean']
 [Parallel(n_jobs=-1)]: Done  45 out of  45 | elapsed:  3.4min finished
 

@@ -6,13 +6,15 @@
 #import pandas as pd
 import numpy as np
 #from functools import reduce
+import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import cross_validation
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
 
 from read_clean_data import readRawColumns, readRawData, rfFitScore, \
-    getImportantColumns
+    getImportantColumns, getPlotDir
 
 def rename_columns(df):
     '''rename columns x0-xn except subject and activity (latter is Y)'''
@@ -26,6 +28,21 @@ def rename_columns(df):
 def get_validation_data(dfx):
     '''get validation data'''
     return dfx[(dfx['subject'] >= 19) & (dfx['subject'] < 27)]
+
+def plot_confusion_matrix(cm, label, target_names):
+    plt.clf()
+    plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+    title='Confusion matrix ' + label
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(target_names))
+    plt.xticks(tick_marks, target_names)  # rotation=45
+    plt.yticks(tick_marks, target_names)
+    plt.tight_layout()  # adds padding
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plotdir = getPlotDir()
+    plt.savefig(plotdir + label + '_conf_mat')
 
 if __name__ == '__main__':
     dfcol, dups = readRawColumns()
@@ -105,6 +122,8 @@ if __name__ == '__main__':
 #    print("gs params", gs.get_params())
     # all mean within 2 * std of each other, best not meaningful 
     print("\nclassification_report\n", classification_report(dftest_y['Y'], new_y))
+    cm = confusion_matrix(dftest_y['Y'], new_y)
+    plot_confusion_matrix(cm, 'opt', list(sorted(set(dftest_y['Y']))))
     
     # for test, use optimum validation params, get stats on it
     scores = []
@@ -115,7 +134,7 @@ if __name__ == '__main__':
 #        clf = gs.best_estimator_
         score, imp, oob = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
         impcol = getImportantColumns(dftrain.columns, imp)
-        print("opt fit: top twenty important columns:\n", impcol[:20])
+        print("opt fit: top ten important columns:\n", impcol[:10])
         scores.append(score)
         oobs.append(oob)
 
@@ -124,6 +143,10 @@ if __name__ == '__main__':
 
 # end output copied
 
-# need dfcol to find original labels of importances
-#    impcol2 = getImportantColumns(dfcol['label2'], imp)  # need in loop
+# find original labels of importances
+#  could do for each in opt list, take set intersection of top 10
+#  but almost no difference in opt parameters, just get a sense of it
+    impcol2 = getImportantColumns(dfcol['label2'], imp)
+    print("Top ten importances of last opt fit, by original name:\n", \
+        list(map(lambda e: e[1], impcol2))[:10] )
 
