@@ -7,9 +7,12 @@
 import numpy as np
 #from functools import reduce
 from sklearn.ensemble import RandomForestClassifier
+from sklearn import cross_validation
+from sklearn.grid_search import GridSearchCV
+from sklearn.metrics import classification_report
 
 from read_clean_data import readRawColumns, readRawData, rfFitScore, \
-    getImportantColumns, getPlotDir, plotImportances
+    getImportantColumns
 
 def rename_columns(df):
     '''rename columns x0-xn except subject and activity (latter is Y)'''
@@ -67,7 +70,7 @@ if __name__ == '__main__':
     # really what I want with validation is try several parameters
     scores = []
     oobs = []
-    for i in list(range(4)):  # average of four
+    for i in list(range(5)):  # average of five
         print("Validation n=50")
         clf = RandomForestClassifier(n_estimators=50, oob_score=True)
         score, imp, oob = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
@@ -78,20 +81,49 @@ if __name__ == '__main__':
 
     print("Valid scores mean, std", np.mean(scores), np.std(scores))
     print("Valid oobs mean, std", np.mean(oobs), np.std(oobs))
-
+    
+    clf = RandomForestClassifier(n_estimators=50, oob_score=True)
+    # don't need to split train, valid
+    scores = cross_validation.cross_val_score(clf, \
+        dftrain, dftrain_y['Y'], cv=4)
+    print("\nCV scores:", scores)
+    print("CV scores mean, std", np.mean(scores), np.std(scores))
+    
+    # find optimum parameters if possible
+    clf = RandomForestClassifier(oob_score=True)  # n_estimators=50
+    param_grid = [{'n_estimators': [50, 100, 200], \
+      'max_features': [None, 'sqrt', 'log2'] }]
+    gs = GridSearchCV(estimator=clf, param_grid=param_grid, cv=5, \
+      verbose=1, n_jobs=-1)    # verbose=10
+    gs.fit(dftrain, dftrain_y['Y'])
+    new_y = gs.predict(dftest)
+    print("gs score %.4f (%d of %d)" % (gs.score(dftest, dftest_y['Y']), \
+      sum(new_y == dftest_y['Y']), dftest_y.shape[0] ))
+    print("gs grid scores\n", gs.grid_scores_)
+    print("gs best score %.4f %s\n%s" % \
+      (gs.best_score_, gs.best_params_, gs.best_estimator_))
+#    print("gs params", gs.get_params())
+    # all mean within 2 * std of each other, best not meaningful 
+    print("\nclassification_report\n", classification_report(dftest_y['Y'], new_y))
+    
     # for test, use optimum validation params, get stats on it
     scores = []
     oobs = []
-    for i in list(range(4)):  # average of four
-        print("Test n=50")
+    for i in list(range(5)):  # average of five
+        print("Test optimum")
         clf = RandomForestClassifier(n_estimators=50, oob_score=True)
+#        clf = gs.best_estimator_
         score, imp, oob = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
         impcol = getImportantColumns(dftrain.columns, imp)
-        print("n=50 fit: top ten important columns:\n", impcol[:10])
+        print("opt fit: top twenty important columns:\n", impcol[:20])
         scores.append(score)
         oobs.append(oob)
 
     print("Test scores mean, std", np.mean(scores), np.std(scores))
     print("Test oobs mean, std", np.mean(oobs), np.std(oobs))
 
+# end output copied
+
+# need dfcol to find original labels of importances
+#    impcol2 = getImportantColumns(dfcol['label2'], imp)  # need in loop
 
