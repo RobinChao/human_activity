@@ -5,8 +5,8 @@
 
 #import pandas as pd
 import numpy as np
-#from functools import reduce
 import matplotlib.pyplot as plt
+from functools import reduce
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import cross_validation
 from sklearn.grid_search import GridSearchCV
@@ -29,10 +29,10 @@ def get_validation_data(dfx):
     '''get validation data'''
     return dfx[(dfx['subject'] >= 19) & (dfx['subject'] < 27)]
 
-def plot_confusion_matrix(cm, label, target_names):
+def plot_confusion_matrix(cm, plotdir, label, target_names):
     plt.clf()
     plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
-    title='Confusion matrix ' + label
+    title='Random Forest: Confusion matrix ' + label
     plt.title(title)
     plt.colorbar()
     tick_marks = np.arange(len(target_names))
@@ -41,8 +41,20 @@ def plot_confusion_matrix(cm, label, target_names):
     plt.tight_layout()  # adds padding
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    plotdir = getPlotDir()
     plt.savefig(plotdir + label + '_conf_mat')
+
+def gridscore_boxplot(gslist, plotdir, label, xlabel):
+    vals = list(map(lambda e: e.cv_validation_scores, gslist))
+    labs = list(map(lambda e: list(e.parameters.values()), gslist))
+    labs = list(map(lambda e: reduce(lambda a,b: str(a)+"\n"+str(b), e), labs))
+    xpar = list(gslist[0].parameters.keys())
+    xpar = reduce(lambda a,b: a+", "+b, xpar)
+    plt.clf()
+    plt.boxplot(vals, labels=labs)
+    plt.title("Human Activity Predicted by Random Forest")
+    plt.xlabel(xpar + " (with " + xlabel + ")")
+    plt.ylabel("Fraction Correct")
+    plt.savefig(plotdir + "gridscore_" + label)
 
 if __name__ == '__main__':
     dfcol, dups = readRawColumns()
@@ -52,6 +64,8 @@ if __name__ == '__main__':
     dftest = rename_columns(dftest)
     print("dftrain shape head", dftrain.shape, "\n", dftrain[:5])
     print("dftest shape head", dftest.shape, "\n", dftest[:5])
+    
+    plotdir = getPlotDir()
     
     # which subjects?
     subjtrain = set(list(dftrain['subject']))
@@ -121,9 +135,11 @@ if __name__ == '__main__':
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
 #    print("gs params", gs.get_params())
     # all mean within 2 * std of each other, best not meaningful 
+    gridscore_boxplot(gs.grid_scores_, plotdir, \
+        "multi_opt", "oob_score=True")
     print("\nclassification_report\n", classification_report(dftest_y['Y'], new_y))
     cm = confusion_matrix(dftest_y['Y'], new_y)
-    plot_confusion_matrix(cm, 'opt', list(sorted(set(dftest_y['Y']))))
+    plot_confusion_matrix(cm, plotdir, 'opt', list(sorted(set(dftest_y['Y']))))
     
     # for test, use optimum validation params, get stats on it
     scores = []

@@ -253,6 +253,7 @@ def plotHistograms(dftrain, dftrain_y, plotdir):
         plt.text(-2.5, -170, "Histograms of " + label + " by Activity")
         plt.savefig(plotdir + "hist_" + label)
 
+# only works if one parameter explored
 def gridscore_boxplot(gslist, plotdir, label, xlabel):
     vals = list(map(lambda e: e.cv_validation_scores, gslist))
     labs = list(map(lambda e: list(e.parameters.values())[0], gslist))
