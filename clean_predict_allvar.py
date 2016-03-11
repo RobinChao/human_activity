@@ -43,9 +43,11 @@ def plot_confusion_matrix(cm, plotdir, label, target_names):
     plt.xlabel('Predicted label')
     plt.savefig(plotdir + label + '_conf_mat')
 
-def gridscore_boxplot(gslist, plotdir, label, xlabel):
+# only works if more than one element per labs entry
+def gridscore_boxplot2(gslist, plotdir, label, xlabel):
     vals = list(map(lambda e: e.cv_validation_scores, gslist))
     labs = list(map(lambda e: list(e.parameters.values()), gslist))
+# test if labs[0].__class__ == 'list' and len(labs[0]) > 1
     labs = list(map(lambda e: reduce(lambda a,b: str(a)+"\n"+str(b), e), labs))
     xpar = list(gslist[0].parameters.keys())
     xpar = reduce(lambda a,b: a+", "+b, xpar)
@@ -54,6 +56,7 @@ def gridscore_boxplot(gslist, plotdir, label, xlabel):
     plt.title("Human Activity Predicted by Random Forest")
     plt.xlabel(xpar + " (with " + xlabel + ")")
     plt.ylabel("Fraction Correct")
+    plt.tight_layout()
     plt.savefig(plotdir + "gridscore_" + label)
 
 if __name__ == '__main__':
@@ -135,8 +138,7 @@ if __name__ == '__main__':
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
 #    print("gs params", gs.get_params())
     # all mean within 2 * std of each other, best not meaningful 
-    gridscore_boxplot(gs.grid_scores_, plotdir, \
-        "multi_opt", "oob_score=True")
+    gridscore_boxplot2(gs.grid_scores_, plotdir, "multi_opt", "oob_score=True")
     print("\nclassification_report\n", classification_report(dftest_y['Y'], new_y))
     cm = confusion_matrix(dftest_y['Y'], new_y)
     plot_confusion_matrix(cm, plotdir, 'opt', list(sorted(set(dftest_y['Y']))))

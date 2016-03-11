@@ -161,466 +161,466 @@ dftrain head (7352, 478)
 
 [5 rows x 478 columns]
 Basic check
-test score: 0.89854088904
-test predict True 89.854 percent, 2648 out of 2947
-test predict False 10.146 percent, 299 out of 2947
+test score: 0.912453342382
+test predict True 91.245 percent, 2689 out of 2947
+test predict False 8.755 percent, 258 out of 2947
 test predict probabilities head:
- [[ 0.   0.   0.   0.1  0.9  0. ]
- [ 0.   0.   0.   0.2  0.8  0. ]
- [ 0.   0.   0.   0.   1.   0. ]
+ [[ 0.   0.   0.   0.   1.   0. ]
  [ 0.   0.   0.   0.1  0.9  0. ]
- [ 0.   0.   0.   0.1  0.9  0. ]]
+ [ 0.   0.   0.   0.2  0.8  0. ]
+ [ 0.   0.   0.   0.1  0.9  0. ]
+ [ 0.   0.   0.   0.   1.   0. ]]
 cross table:
  predicted    1    2    3    4    5    6
 actual                                 
-1          479   12    5    0    0    0
-2           77  385    9    0    0    0
-3           29   48  343    0    0    0
-4            0    0    0  436   55    0
-5            0    0    0   64  468    0
+1          480   12    4    0    0    0
+2           59  403    9    0    0    0
+3           19   50  351    0    0    0
+4            0    0    0  442   48    1
+5            0    0    0   56  476    0
 6            0    0    0    0    0  537
-precision [ 0.81880342  0.86516854  0.96078431  0.872       0.89483748  1.        ] 
-recall [ 0.96572581  0.81740977  0.81666667  0.88798371  0.87969925  1.        ] 
-fbeta [ 0.88621647  0.84061135  0.88288288  0.87991927  0.88720379  1.        ] 
+precision [ 0.86021505  0.86666667  0.96428571  0.8875502   0.90839695  0.99814126] 
+recall [ 0.96774194  0.85562633  0.83571429  0.90020367  0.89473684  1.        ] 
+fbeta [ 0.91081594  0.86111111  0.89540816  0.89383215  0.90151515  0.99906977] 
 support [496 471 420 491 532 537]
 Basic check: Top ten important columns:
- [(0.060375528167994449, 'tGravityAcc_Mean_X'), (0.046686079514527148, 'tGravityAcc_Mean_Y'), (0.040598881700777197, 'angle_X_gravityMean'), (0.028718866202089976, 'fAccJerk_bandsEnergy_1_8'), (0.027220767813231794, 'tGravityAcc_max_Z'), (0.027216626956844864, 'angle_Y_gravityMean'), (0.026049053926673844, 'tGravityAcc_max_X'), (0.023873776314205647, 'tGravityAcc_arCoeff_Z1'), (0.022493158818040027, 'fAcc_mad'), (0.021851501666036513, 'tAccJerk_entropy_X')]
+ [(0.06874685753845805, 'tGravityAcc_min_Y'), (0.040573363896365802, 'tAccJerk_Mean'), (0.036275532334010152, 'tGravityAcc_Mean_X'), (0.033576889296079868, 'tGravityAcc_min_X'), (0.032840218183596531, 'angle_X_gravityMean'), (0.024280828111853982, 'tGravityAcc_energy_Y'), (0.02398280200311894, 'fAcc_Std'), (0.022999857340519039, 'tGravityAcc_Mean_Y'), (0.02180968397773499, 'tAcc_max_X'), (0.021688142890462139, 'tGravityAcc_arCoeff_Z2')]
 Overfit
-test score: 0.99972796518
-test predict True 99.973 percent, 7350 out of 7352
-test predict False 0.027 percent, 2 out of 7352
+test score: 1.0
+test predict True 100.000 percent, 7352 out of 7352
+test predict False 0.000 percent, 0 out of 7352
 test predict probabilities head:
- [[ 0.   0.   0.   0.1  0.9  0. ]
- [ 0.   0.   0.   0.   1.   0. ]
- [ 0.   0.   0.   0.   1.   0. ]
- [ 0.   0.   0.   0.   1.   0. ]
- [ 0.   0.   0.   0.   1.   0. ]]
+ [[ 0.    0.    0.    0.05  0.95  0.  ]
+ [ 0.    0.    0.    0.    1.    0.  ]
+ [ 0.    0.    0.    0.    1.    0.  ]
+ [ 0.    0.    0.    0.    1.    0.  ]
+ [ 0.    0.    0.    0.    1.    0.  ]]
 cross table:
  predicted     1     2    3     4     5     6
 actual                                      
 1          1226     0    0     0     0     0
-2             0  1072    1     0     0     0
+2             0  1073    0     0     0     0
 3             0     0  986     0     0     0
 4             0     0    0  1286     0     0
-5             0     0    0     1  1373     0
+5             0     0    0     0  1374     0
 6             0     0    0     0     0  1407
-precision [ 1.          1.          0.99898683  0.999223    1.          1.        ] 
-recall [ 1.          0.99906803  1.          1.          0.9992722   1.        ] 
-fbeta [ 1.          0.9995338   0.99949316  0.99961135  0.99963597  1.        ] 
+precision [ 1.  1.  1.  1.  1.  1.] 
+recall [ 1.  1.  1.  1.  1.  1.] 
+fbeta [ 1.  1.  1.  1.  1.  1.] 
 support [1226 1073  986 1286 1374 1407]
 Overfit: Top ten important columns:
- [(0.036578930374493772, 'tGravityAcc_energy_X'), (0.035458788620877695, 'tGravityAcc_Mean_Y'), (0.034534809013078788, 'tGravityAcc_max_X'), (0.03406142538995903, 'angle_X_gravityMean'), (0.033575707446787582, 'tGravityAcc_max_Y'), (0.031676942069220462, 'fAccJerk_bandsEnergy_1_24'), (0.031491002632216915, 'fAcc_bandsEnergy_1_24'), (0.022842257448315272, 'tGravityAcc_Mean_X'), (0.021378839086293299, 'fAccJerk_bandsEnergy_1_16'), (0.020053863738745854, 'tAccJerk_entropy_Y')]
+ [(0.037460862261182913, 'tGravityAcc_energy_Y'), (0.033504659933171296, 'angle_X_gravityMean'), (0.033388902372783448, 'angle_Y_gravityMean'), (0.031993719253286625, 'tGravityAcc_min_X'), (0.028099412276826396, 'tGravityAcc_energy_X'), (0.027141869520756794, 'tGravityAcc_max_X'), (0.025605810721970594, 'tGravityAcc_Mean_Y'), (0.025544429694277199, 'fAccJerk_bandsEnergy_1_8'), (0.025349550112764224, 'tGravityAcc_min_Y'), (0.020090181159702021, 'fAccJerk_Std_X')]
 Fitting 3 folds for each of 4 candidates, totalling 12 fits
 [Parallel(n_jobs=-1)]: Done  12 out of  12 | elapsed:  1.0min finished
-gs score 0.90770 (2075 of 2286)
+gs score 0.90639 (2072 of 2286)
 gs grid scores
- [mean: 0.89637, std: 0.01249, params: {'n_estimators': 50}, mean: 0.89716, std: 0.01212, params: {'n_estimators': 100}, mean: 0.89321, std: 0.00619, params: {'n_estimators': 200}, mean: 0.89499, std: 0.01028, params: {'n_estimators': 500}]
-gs best score 0.89716 {'n_estimators': 100}
+ [mean: 0.89420, std: 0.01218, params: {'n_estimators': 50}, mean: 0.88926, std: 0.00947, params: {'n_estimators': 100}, mean: 0.89360, std: 0.00860, params: {'n_estimators': 200}, mean: 0.89281, std: 0.00505, params: {'n_estimators': 500}]
+gs best score 0.89420 {'n_estimators': 50}
 RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
             max_depth=None, max_features='sqrt', max_leaf_nodes=None,
             min_samples_leaf=1, min_samples_split=2,
-            min_weight_fraction_leaf=0.0, n_estimators=100, n_jobs=1,
+            min_weight_fraction_leaf=0.0, n_estimators=50, n_jobs=1,
             oob_score=False, random_state=None, verbose=0,
             warm_start=False)
 Fitting 3 folds for each of 9 candidates, totalling 27 fits
-[Parallel(n_jobs=-1)]: Done  27 out of  27 | elapsed:  3.3min finished
-gs score 0.93701 (2142 of 2286)
+[Parallel(n_jobs=-1)]: Done  27 out of  27 | elapsed:  3.6min finished
+gs score 0.92782 (2121 of 2286)
 gs grid scores
- [mean: 0.84287, std: 0.04374, params: {'max_features': None}, mean: 0.89676, std: 0.00964, params: {'max_features': 'auto'}, mean: 0.89360, std: 0.00570, params: {'max_features': 'sqrt'}, mean: 0.90801, std: 0.01238, params: {'max_features': 'log2'}, mean: 0.90111, std: 0.01263, params: {'max_features': 9}, mean: 0.89953, std: 0.01367, params: {'max_features': 15}, mean: 0.89913, std: 0.00909, params: {'max_features': 22}, mean: 0.88334, std: 0.01110, params: {'max_features': 44}, mean: 0.87485, std: 0.01116, params: {'max_features': 100}]
-gs best score 0.90801 {'max_features': 'log2'}
+ [mean: 0.84327, std: 0.04456, params: {'max_features': None}, mean: 0.89518, std: 0.00644, params: {'max_features': 'auto'}, mean: 0.89104, std: 0.00678, params: {'max_features': 'sqrt'}, mean: 0.90229, std: 0.01111, params: {'max_features': 'log2'}, mean: 0.90387, std: 0.01175, params: {'max_features': 9}, mean: 0.89479, std: 0.00769, params: {'max_features': 15}, mean: 0.89025, std: 0.00636, params: {'max_features': 22}, mean: 0.88433, std: 0.01040, params: {'max_features': 44}, mean: 0.87742, std: 0.01639, params: {'max_features': 100}]
+gs best score 0.90387 {'max_features': 9}
 RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
-            max_depth=None, max_features='log2', max_leaf_nodes=None,
+            max_depth=None, max_features=9, max_leaf_nodes=None,
             min_samples_leaf=1, min_samples_split=2,
             min_weight_fraction_leaf=0.0, n_estimators=100, n_jobs=1,
             oob_score=False, random_state=None, verbose=0,
             warm_start=False)
 Validation n=100
-test score: 0.90813648294
-test predict True 90.814 percent, 2076 out of 2286
-test predict False 9.186 percent, 210 out of 2286
+test score: 0.913823272091
+test predict True 91.382 percent, 2089 out of 2286
+test predict False 8.618 percent, 197 out of 2286
 test predict probabilities head:
- [[ 0.    0.    0.    0.48  0.44  0.08]
- [ 0.    0.    0.    0.47  0.48  0.05]
- [ 0.    0.    0.    0.54  0.44  0.02]
- [ 0.    0.    0.    0.55  0.43  0.02]
- [ 0.    0.    0.    0.6   0.39  0.01]]
+ [[ 0.    0.    0.    0.43  0.52  0.05]
+ [ 0.    0.    0.    0.53  0.42  0.05]
+ [ 0.    0.    0.    0.55  0.44  0.01]
+ [ 0.    0.    0.    0.58  0.42  0.  ]
+ [ 0.    0.    0.    0.58  0.39  0.03]]
 cross table:
  predicted    1    2    3    4    5    6
 actual                                 
 1          361    0    0    0    1    0
-2            9  288    9    0   30    0
-3           16   46  246    0    0    0
-4            0    0    0  369   38    0
-5            0    0    0   61  370    0
+2            4  300    4    0   28    0
+3           15   46  247    0    0    0
+4            0    0    0  370   37    0
+5            0    0    0   62  369    0
 6            0    0    0    0    0  442
-precision [ 0.93523316  0.86227545  0.96470588  0.85813953  0.8428246   1.        ] 
-recall [ 0.99723757  0.85714286  0.7987013   0.90663391  0.85846868  1.        ] 
-fbeta [ 0.96524064  0.85970149  0.87388988  0.88172043  0.85057471  1.        ] 
+precision [ 0.95        0.86705202  0.98406375  0.85648148  0.84827586  1.        ] 
+recall [ 0.99723757  0.89285714  0.80194805  0.90909091  0.85614849  1.        ] 
+fbeta [ 0.97304582  0.8797654   0.88372093  0.88200238  0.852194    1.        ] 
 support [362 336 308 407 431 442]
 n=100 fit: top ten important columns:
- [(0.043033405242331339, 'tGravityAcc_min_X'), (0.033296016559719067, 'tGravityAcc_energy_X'), (0.031139402074602106, 'tGravityAcc_Mean_X'), (0.027266751318508736, 'tGravityAcc_Mean_Y'), (0.027182293282261433, 'tGravityAcc_max_Y'), (0.026350084303457626, 'angle_Y_gravityMean'), (0.024449451959696691, 'tGravityAcc_min_Y'), (0.02144649818523043, 'angle_X_gravityMean'), (0.018709920792943303, 'tGravityAcc_max_X'), (0.014930429344495191, 'tGravityAcc_mad')]
+ [(0.041536500006209433, 'angle_X_gravityMean'), (0.040521371225733252, 'tGravityAcc_min_X'), (0.032347967579974407, 'tGravityAcc_Mean_Y'), (0.025932787637122669, 'tGravityAcc_Mean_X'), (0.024935879283494694, 'tGravityAcc_max_Y'), (0.024198041113254642, 'tGravityAcc_min_Y'), (0.023955356512132209, 'tGravityAcc_max_X'), (0.022162505298347294, 'tGravityAcc_energy_X'), (0.021712570655475535, 'tGravityAcc_energy_Y'), (0.020448444871525761, 'angle_Y_gravityMean')]
 Validation n=200
-test score: 0.907261592301
-test predict True 90.726 percent, 2074 out of 2286
-test predict False 9.274 percent, 212 out of 2286
-test predict probabilities head:
- [[ 0.     0.     0.     0.52   0.405  0.075]
- [ 0.     0.     0.     0.545  0.405  0.05 ]
- [ 0.     0.     0.     0.53   0.435  0.035]
- [ 0.     0.     0.     0.555  0.42   0.025]
- [ 0.     0.     0.     0.615  0.37   0.015]]
-cross table:
- predicted    1    2    3    4    5    6
-actual                                 
-1          361    1    0    0    0    0
-2            8  291   10    0   27    0
-3           14   48  246    0    0    0
-4            0    0    0  369   38    0
-5            0    0    0   66  365    0
-6            0    0    0    0    0  442
-precision [ 0.94255875  0.85588235  0.9609375   0.84827586  0.84883721  1.        ] 
-recall [ 0.99723757  0.86607143  0.7987013   0.90663391  0.84686775  1.        ] 
-fbeta [ 0.96912752  0.86094675  0.87234043  0.87648456  0.84785134  1.        ] 
-support [362 336 308 407 431 442]
-n=200 fit: top ten important columns:
- [(0.033233258212665109, 'angle_Y_gravityMean'), (0.033186400616001678, 'tGravityAcc_Mean_X'), (0.032443506347799488, 'tGravityAcc_min_Y'), (0.03031949903357407, 'angle_X_gravityMean'), (0.029555294028889029, 'tGravityAcc_max_X'), (0.027509703629544382, 'tGravityAcc_min_X'), (0.026541780906836628, 'tGravityAcc_max_Y'), (0.025880221588768806, 'tGravityAcc_energy_X'), (0.025310727336317215, 'tGravityAcc_Mean_Y'), (0.014092151070096124, 'tGravityAcc_energy_Y')]
-Validation n=500
-test score: 0.909011373578
-test predict True 90.901 percent, 2078 out of 2286
-test predict False 9.099 percent, 208 out of 2286
-test predict probabilities head:
- [[ 0.     0.     0.     0.476  0.48   0.044]
- [ 0.     0.     0.     0.53   0.448  0.022]
- [ 0.     0.     0.     0.518  0.474  0.008]
- [ 0.     0.     0.     0.552  0.436  0.012]
- [ 0.     0.     0.     0.616  0.38   0.004]]
-cross table:
- predicted    1    2    3    4    5    6
-actual                                 
-1          361    0    0    0    1    0
-2            6  293    9    0   28    0
-3           16   44  248    0    0    0
-4            0    0    0  369   38    0
-5            0    0    0   66  365    0
-6            0    0    0    0    0  442
-precision [ 0.94255875  0.8694362   0.96498054  0.84827586  0.84490741  1.        ] 
-recall [ 0.99723757  0.87202381  0.80519481  0.90663391  0.84686775  1.        ] 
-fbeta [ 0.96912752  0.87072808  0.87787611  0.87648456  0.84588644  1.        ] 
-support [362 336 308 407 431 442]
-n=500 fit: top ten important columns:
- [(0.034620233917215422, 'tGravityAcc_min_X'), (0.030979045466437333, 'tGravityAcc_energy_X'), (0.030971864403422086, 'tGravityAcc_Mean_X'), (0.029734097417521786, 'tGravityAcc_Mean_Y'), (0.029430392027929048, 'tGravityAcc_min_Y'), (0.02882196517437462, 'angle_X_gravityMean'), (0.02517095331786004, 'tGravityAcc_max_Y'), (0.024553843106258508, 'angle_Y_gravityMean'), (0.021913336886184777, 'tGravityAcc_max_X'), (0.020394284291430004, 'tGravityAcc_energy_Y')]
-Validation n=100
 test score: 0.906386701662
-oob score 0.979668377418
 test predict True 90.639 percent, 2072 out of 2286
 test predict False 9.361 percent, 214 out of 2286
 test predict probabilities head:
- [[ 0.    0.    0.    0.52  0.45  0.03]
- [ 0.    0.    0.    0.53  0.42  0.05]
- [ 0.    0.    0.    0.53  0.46  0.01]
- [ 0.    0.    0.    0.59  0.4   0.01]
- [ 0.    0.    0.    0.72  0.26  0.02]]
+ [[ 0.     0.     0.     0.505  0.45   0.045]
+ [ 0.     0.     0.     0.515  0.44   0.045]
+ [ 0.     0.     0.     0.53   0.445  0.025]
+ [ 0.     0.     0.     0.555  0.43   0.015]
+ [ 0.     0.     0.     0.62   0.36   0.02 ]]
+cross table:
+ predicted    1    2    3    4    5    6
+actual                                 
+1          361    1    0    0    0    0
+2           10  291    8    0   27    0
+3           19   47  242    0    0    0
+4            0    0    0  369   38    0
+5            0    0    0   64  367    0
+6            0    0    0    0    0  442
+precision [ 0.92564103  0.85840708  0.968       0.852194    0.84953704  1.        ] 
+recall [ 0.99723757  0.86607143  0.78571429  0.90663391  0.85150812  1.        ] 
+fbeta [ 0.96010638  0.86222222  0.86738351  0.87857143  0.85052144  1.        ] 
+support [362 336 308 407 431 442]
+n=200 fit: top ten important columns:
+ [(0.03913436424478945, 'angle_X_gravityMean'), (0.0374783578875355, 'tGravityAcc_energy_X'), (0.029720993232637088, 'tGravityAcc_min_Y'), (0.028430109079238586, 'tGravityAcc_max_Y'), (0.026788036626500696, 'tGravityAcc_Mean_Y'), (0.026562943552539589, 'angle_Y_gravityMean'), (0.02569968087743784, 'tGravityAcc_min_X'), (0.021950680221192252, 'tGravityAcc_Mean_X'), (0.021913779586711077, 'tGravityAcc_max_X'), (0.021722309554148403, 'tGravityAcc_energy_Y')]
+Validation n=500
+test score: 0.90769903762
+test predict True 90.770 percent, 2075 out of 2286
+test predict False 9.230 percent, 211 out of 2286
+test predict probabilities head:
+ [[ 0.     0.     0.     0.502  0.462  0.036]
+ [ 0.     0.     0.     0.518  0.458  0.024]
+ [ 0.     0.     0.     0.504  0.474  0.022]
+ [ 0.     0.     0.     0.574  0.412  0.014]
+ [ 0.     0.     0.     0.616  0.378  0.006]]
 cross table:
  predicted    1    2    3    4    5    6
 actual                                 
 1          362    0    0    0    0    0
-2            6  291   10    0   29    0
-3           10   53  245    0    0    0
+2           11  286   10    0   29    0
+3           15   48  245    0    0    0
 4            0    0    0  369   38    0
-5            0    0    0   68  363    0
+5            0    0    0   60  371    0
 6            0    0    0    0    0  442
-precision [ 0.95767196  0.84593023  0.96078431  0.84439359  0.84418605  1.        ] 
-recall [ 1.          0.86607143  0.79545455  0.90663391  0.84222738  1.        ] 
-fbeta [ 0.97837838  0.85588235  0.87033748  0.87440758  0.84320557  1.        ] 
+precision [ 0.93298969  0.85628743  0.96078431  0.86013986  0.84703196  1.        ] 
+recall [ 1.          0.85119048  0.79545455  0.90663391  0.86078886  1.        ] 
+fbeta [ 0.96533333  0.85373134  0.87033748  0.88277512  0.85385501  1.        ] 
 support [362 336 308 407 431 442]
-n=100 fit: top ten important columns:
- [(0.03509317658174959, 'tGravityAcc_Mean_X'), (0.033807783385497128, 'tGravityAcc_min_X'), (0.028711099794970128, 'tGravityAcc_max_Y'), (0.028177831109908964, 'tGravityAcc_max_X'), (0.0256541731988368, 'tGravityAcc_energy_X'), (0.02507438669504403, 'tGravityAcc_Mean_Y'), (0.025013424187542058, 'angle_Y_gravityMean'), (0.024022844919953535, 'angle_X_gravityMean'), (0.021284557664814959, 'tGravityAcc_min_Y'), (0.019173314247486743, 'tGravityAcc_energy_Y')]
-Validation n=200
+n=500 fit: top ten important columns:
+ [(0.036101953665978785, 'tGravityAcc_Mean_X'), (0.034661237075065188, 'angle_X_gravityMean'), (0.029257011368410885, 'angle_Y_gravityMean'), (0.029107400864447006, 'tGravityAcc_min_Y'), (0.029004899645420724, 'tGravityAcc_min_X'), (0.027883286363046531, 'tGravityAcc_energy_X'), (0.025031298091526759, 'tGravityAcc_max_Y'), (0.023956060132427157, 'tGravityAcc_Mean_Y'), (0.02236349759067886, 'tGravityAcc_max_X'), (0.0158136251102774, 'tGravityAcc_energy_Y')]
+Validation n=100
 test score: 0.909448818898
-oob score 0.98223450454
+oob score 0.980063166206
 test predict True 90.945 percent, 2079 out of 2286
 test predict False 9.055 percent, 207 out of 2286
 test predict probabilities head:
- [[ 0.     0.     0.     0.505  0.445  0.05 ]
- [ 0.     0.005  0.     0.535  0.435  0.025]
- [ 0.     0.     0.     0.485  0.5    0.015]
- [ 0.     0.     0.     0.56   0.43   0.01 ]
- [ 0.     0.     0.     0.625  0.37   0.005]]
+ [[ 0.    0.    0.    0.5   0.45  0.05]
+ [ 0.    0.    0.    0.56  0.38  0.06]
+ [ 0.    0.    0.    0.6   0.36  0.04]
+ [ 0.    0.    0.    0.62  0.34  0.04]
+ [ 0.    0.    0.    0.71  0.28  0.01]]
 cross table:
  predicted    1    2    3    4    5    6
 actual                                 
-1          361    1    0    0    0    0
-2            9  297    7    0   23    0
-3           17   46  245    0    0    0
+1          362    0    0    0    0    0
+2            9  292   10    0   25    0
+3           18   41  249    0    0    0
 4            0    0    0  369   38    0
 5            0    0    0   66  365    0
 6            0    0    0    0    0  442
-precision [ 0.93281654  0.86337209  0.97222222  0.84827586  0.85680751  1.        ] 
-recall [ 0.99723757  0.88392857  0.79545455  0.90663391  0.84686775  1.        ] 
-fbeta [ 0.96395194  0.87352941  0.875       0.87648456  0.85180863  1.        ] 
-support [362 336 308 407 431 442]
-n=200 fit: top ten important columns:
- [(0.037726563230217544, 'angle_X_gravityMean'), (0.03434193644559641, 'tGravityAcc_min_X'), (0.03256453489080003, 'tGravityAcc_energy_X'), (0.030355079290744089, 'tGravityAcc_max_Y'), (0.030232870370285627, 'tGravityAcc_Mean_X'), (0.029628095193718881, 'tGravityAcc_Mean_Y'), (0.026017779357572105, 'tGravityAcc_max_X'), (0.024755652406039563, 'tGravityAcc_min_Y'), (0.024232114533249593, 'angle_Y_gravityMean'), (0.018226597331129343, 'tGravityAcc_energy_Y')]
-Validation n=500
-test score: 0.903324584427
-oob score 0.984800631662
-test predict True 90.332 percent, 2065 out of 2286
-test predict False 9.668 percent, 221 out of 2286
-test predict probabilities head:
- [[ 0.     0.     0.     0.514  0.458  0.028]
- [ 0.     0.     0.     0.534  0.436  0.03 ]
- [ 0.     0.     0.     0.498  0.48   0.022]
- [ 0.     0.     0.     0.53   0.456  0.014]
- [ 0.     0.     0.     0.622  0.364  0.014]]
-cross table:
- predicted    1    2    3    4    5    6
-actual                                 
-1          362    0    0    0    0    0
-2            9  288   11    0   28    0
-3           15   47  246    0    0    0
-4            0    0    0  369   38    0
-5            0    0    0   73  358    0
-6            0    0    0    0    0  442
-precision [ 0.93782383  0.85970149  0.95719844  0.83484163  0.84433962  1.        ] 
-recall [ 1.          0.85714286  0.7987013   0.90663391  0.83062645  1.        ] 
-fbeta [ 0.96791444  0.85842027  0.87079646  0.86925795  0.8374269   1.        ] 
-support [362 336 308 407 431 442]
-n=500 fit: top ten important columns:
- [(0.036159238856784362, 'tGravityAcc_min_X'), (0.033479320418133486, 'angle_X_gravityMean'), (0.029944891251585292, 'tGravityAcc_Mean_Y'), (0.029690035629647341, 'angle_Y_gravityMean'), (0.029497895294588433, 'tGravityAcc_Mean_X'), (0.02866973032541539, 'tGravityAcc_min_Y'), (0.02711156655795529, 'tGravityAcc_energy_X'), (0.024244910677453883, 'tGravityAcc_max_Y'), (0.023095324208384106, 'tGravityAcc_max_X'), (0.018093063843670074, 'tGravityAcc_energy_Y')]
-Validation n=100
-test score: 0.907261592301
-oob score 0.981444926964
-test predict True 90.726 percent, 2074 out of 2286
-test predict False 9.274 percent, 212 out of 2286
-test predict probabilities head:
- [[ 0.    0.    0.    0.38  0.57  0.05]
- [ 0.    0.    0.    0.54  0.42  0.04]
- [ 0.    0.    0.    0.54  0.44  0.02]
- [ 0.    0.    0.    0.48  0.51  0.01]
- [ 0.    0.    0.    0.58  0.42  0.  ]]
-cross table:
- predicted    1    2    3    4    5    6
-actual                                 
-1          361    1    0    0    0    0
-2           10  286    6    0   34    0
-3           23   37  248    0    0    0
-4            0    0    0  369   38    0
-5            0    0    0   63  368    0
-6            0    0    0    0    0  442
-precision [ 0.91624365  0.88271605  0.97637795  0.85416667  0.83636364  1.        ] 
-recall [ 0.99723757  0.85119048  0.80519481  0.90663391  0.85382831  1.        ] 
-fbeta [ 0.95502646  0.86666667  0.88256228  0.87961859  0.84500574  1.        ] 
+precision [ 0.93059126  0.87687688  0.96138996  0.84827586  0.85280374  1.        ] 
+recall [ 1.          0.86904762  0.80844156  0.90663391  0.84686775  1.        ] 
+fbeta [ 0.96404794  0.87294469  0.87830688  0.87648456  0.84982538  1.        ] 
 support [362 336 308 407 431 442]
 n=100 fit: top ten important columns:
- [(0.036895241785698314, 'tGravityAcc_Mean_Y'), (0.036244486551409445, 'tGravityAcc_energy_X'), (0.035971566204634008, 'angle_Y_gravityMean'), (0.033834967210630972, 'tGravityAcc_max_X'), (0.029314267693981277, 'tGravityAcc_min_Y'), (0.027129369814436938, 'tGravityAcc_min_X'), (0.024701608560649596, 'angle_X_gravityMean'), (0.022945836251052922, 'tGravityAcc_Mean_X'), (0.02208971817611307, 'tGravityAcc_energy_Y'), (0.019181251319863982, 'tGravityAcc_max_Y')]
+ [(0.032693163478807352, 'tGravityAcc_min_X'), (0.032382238999908025, 'angle_X_gravityMean'), (0.032333248349579513, 'tGravityAcc_Mean_X'), (0.032168789746399654, 'tGravityAcc_energy_X'), (0.031167566107754688, 'tGravityAcc_max_Y'), (0.030871051276672386, 'tGravityAcc_min_Y'), (0.028243068006464093, 'tGravityAcc_Mean_Y'), (0.024342006706901863, 'angle_Y_gravityMean'), (0.019479663963259418, 'tGravityAcc_max_X'), (0.01861557507672211, 'tAcc_max_X')]
 Validation n=200
-test score: 0.909011373578
-oob score 0.982037110146
-test predict True 90.901 percent, 2078 out of 2286
-test predict False 9.099 percent, 208 out of 2286
+test score: 0.909448818898
+oob score 0.98322147651
+test predict True 90.945 percent, 2079 out of 2286
+test predict False 9.055 percent, 207 out of 2286
 test predict probabilities head:
- [[ 0.     0.     0.     0.465  0.48   0.055]
- [ 0.     0.     0.     0.555  0.405  0.04 ]
- [ 0.     0.     0.     0.54   0.44   0.02 ]
- [ 0.     0.     0.     0.56   0.425  0.015]
- [ 0.     0.     0.     0.62   0.37   0.01 ]]
+ [[ 0.     0.     0.     0.465  0.515  0.02 ]
+ [ 0.     0.     0.     0.46   0.515  0.025]
+ [ 0.     0.     0.     0.485  0.5    0.015]
+ [ 0.     0.     0.     0.53   0.455  0.015]
+ [ 0.     0.     0.     0.59   0.41   0.   ]]
 cross table:
  predicted    1    2    3    4    5    6
 actual                                 
 1          362    0    0    0    0    0
-2            7  293    9    0   27    0
-3           15   49  244    0    0    0
+2            9  291    8    0   28    0
+3           22   44  242    0    0    0
 4            0    0    0  369   38    0
-5            0    0    0   63  368    0
+5            0    0    0   58  373    0
 6            0    0    0    0    0  442
-precision [ 0.94270833  0.85672515  0.96442688  0.85416667  0.84988453  1.        ] 
-recall [ 1.          0.87202381  0.79220779  0.90663391  0.85382831  1.        ] 
-fbeta [ 0.97050938  0.86430678  0.86987522  0.87961859  0.85185185  1.        ] 
+precision [ 0.92111959  0.86865672  0.968       0.86416862  0.84965831  1.        ] 
+recall [ 1.          0.86607143  0.78571429  0.90663391  0.86542923  1.        ] 
+fbeta [ 0.9589404   0.86736215  0.86738351  0.88489209  0.85747126  1.        ] 
 support [362 336 308 407 431 442]
 n=200 fit: top ten important columns:
- [(0.03548113522342744, 'tGravityAcc_min_X'), (0.031177114250005765, 'tGravityAcc_min_Y'), (0.030352786301801587, 'angle_Y_gravityMean'), (0.029582166258365294, 'tGravityAcc_max_X'), (0.028273858686416506, 'tGravityAcc_Mean_X'), (0.027221368366889983, 'tGravityAcc_energy_X'), (0.026914287388071858, 'angle_X_gravityMean'), (0.024462344155797733, 'tGravityAcc_Mean_Y'), (0.024174903188187755, 'tGravityAcc_max_Y'), (0.019484014167901801, 'tGravityAcc_energy_Y')]
+ [(0.038885017055084285, 'tGravityAcc_max_X'), (0.03290555251568781, 'angle_X_gravityMean'), (0.031006929316703381, 'angle_Y_gravityMean'), (0.030540536358382317, 'tGravityAcc_min_X'), (0.029744751778263273, 'tGravityAcc_max_Y'), (0.027926232952337357, 'tGravityAcc_Mean_Y'), (0.026968158645009663, 'tGravityAcc_Mean_X'), (0.023323143405999308, 'tGravityAcc_min_Y'), (0.019704168467090336, 'tGravityAcc_energy_X'), (0.017916680228599678, 'tGravityAcc_energy_Y')]
 Validation n=500
-test score: 0.907261592301
-oob score 0.983418870904
-test predict True 90.726 percent, 2074 out of 2286
-test predict False 9.274 percent, 212 out of 2286
+test score: 0.906824146982
+oob score 0.983813659692
+test predict True 90.682 percent, 2073 out of 2286
+test predict False 9.318 percent, 213 out of 2286
 test predict probabilities head:
- [[ 0.     0.     0.     0.486  0.478  0.036]
- [ 0.     0.     0.     0.53   0.446  0.024]
- [ 0.     0.     0.     0.524  0.454  0.022]
- [ 0.     0.     0.     0.546  0.438  0.016]
- [ 0.     0.     0.     0.662  0.322  0.016]]
+ [[ 0.     0.     0.     0.516  0.44   0.044]
+ [ 0.     0.     0.     0.546  0.42   0.034]
+ [ 0.     0.     0.     0.51   0.478  0.012]
+ [ 0.     0.     0.     0.54   0.442  0.018]
+ [ 0.     0.     0.     0.608  0.384  0.008]]
 cross table:
  predicted    1    2    3    4    5    6
 actual                                 
 1          362    0    0    0    0    0
-2            8  292    9    0   27    0
-3           18   45  245    0    0    0
+2            6  295    8    0   27    0
+3           16   47  245    0    0    0
+4            0    0    0  369   38    0
+5            0    0    0   71  360    0
+6            0    0    0    0    0  442
+precision [ 0.94270833  0.8625731   0.96837945  0.83863636  0.84705882  1.        ] 
+recall [ 1.          0.87797619  0.79545455  0.90663391  0.83526682  1.        ] 
+fbeta [ 0.97050938  0.87020649  0.87344029  0.87131051  0.8411215   1.        ] 
+support [362 336 308 407 431 442]
+n=500 fit: top ten important columns:
+ [(0.033845332536948054, 'tGravityAcc_min_X'), (0.031153578477993632, 'tGravityAcc_max_X'), (0.029236141165441643, 'angle_X_gravityMean'), (0.028316676107775145, 'tGravityAcc_energy_X'), (0.02808741033104081, 'tGravityAcc_Mean_Y'), (0.028025570677346127, 'tGravityAcc_Mean_X'), (0.027726734395731738, 'angle_Y_gravityMean'), (0.026142712991184657, 'tGravityAcc_min_Y'), (0.024858481797207642, 'tGravityAcc_max_Y'), (0.020318368318372006, 'tGravityAcc_energy_Y')]
+Validation n=100
+test score: 0.910323709536
+oob score 0.979470983024
+test predict True 91.032 percent, 2081 out of 2286
+test predict False 8.968 percent, 205 out of 2286
+test predict probabilities head:
+ [[ 0.    0.    0.    0.65  0.31  0.04]
+ [ 0.    0.    0.    0.6   0.38  0.02]
+ [ 0.    0.    0.    0.59  0.4   0.01]
+ [ 0.    0.    0.    0.59  0.4   0.01]
+ [ 0.    0.    0.    0.67  0.32  0.01]]
+cross table:
+ predicted    1    2    3    4    5    6
+actual                                 
+1          362    0    0    0    0    0
+2           11  290    9    0   26    0
+3           18   44  246    0    0    0
+4            0    0    0  369   38    0
+5            0    0    0   59  372    0
+6            0    0    0    0    0  442
+precision [ 0.9258312   0.86826347  0.96470588  0.86214953  0.85321101  1.        ] 
+recall [ 1.          0.86309524  0.7987013   0.90663391  0.86310905  1.        ] 
+fbeta [ 0.96148738  0.86567164  0.87388988  0.88383234  0.85813149  1.        ] 
+support [362 336 308 407 431 442]
+n=100 fit: top ten important columns:
+ [(0.045957613681973195, 'tGravityAcc_min_X'), (0.035139304196211744, 'angle_X_gravityMean'), (0.031196777199279338, 'tGravityAcc_min_Y'), (0.029044385036713281, 'tGravityAcc_Mean_Y'), (0.028412334108116801, 'tGravityAcc_energy_X'), (0.025680382834483328, 'tGravityAcc_max_Y'), (0.023642342529944051, 'tGravityAcc_max_X'), (0.023064823388309733, 'angle_Y_gravityMean'), (0.021160149770801606, 'tGravityAcc_energy_Y'), (0.016305468663629138, 'tGravityAcc_Mean_X')]
+Validation n=200
+test score: 0.909448818898
+oob score 0.982431898934
+test predict True 90.945 percent, 2079 out of 2286
+test predict False 9.055 percent, 207 out of 2286
+test predict probabilities head:
+ [[ 0.     0.     0.     0.44   0.525  0.035]
+ [ 0.     0.     0.     0.48   0.475  0.045]
+ [ 0.     0.     0.     0.425  0.55   0.025]
+ [ 0.     0.     0.     0.44   0.535  0.025]
+ [ 0.     0.     0.     0.565  0.415  0.02 ]]
+cross table:
+ predicted    1    2    3    4    5    6
+actual                                 
+1          362    0    0    0    0    0
+2           10  288   10    0   28    0
+3           15   48  245    0    0    0
+4            0    0    0  369   38    0
+5            0    0    0   58  373    0
+6            0    0    0    0    0  442
+precision [ 0.93540052  0.85714286  0.96078431  0.86416862  0.84965831  1.        ] 
+recall [ 1.          0.85714286  0.79545455  0.90663391  0.86542923  1.        ] 
+fbeta [ 0.96662216  0.85714286  0.87033748  0.88489209  0.85747126  1.        ] 
+support [362 336 308 407 431 442]
+n=200 fit: top ten important columns:
+ [(0.032013315131894336, 'tGravityAcc_Mean_X'), (0.030516542854281594, 'tGravityAcc_energy_X'), (0.030327680304895899, 'tGravityAcc_min_X'), (0.027202015935472178, 'tGravityAcc_min_Y'), (0.026681868568342423, 'tGravityAcc_Mean_Y'), (0.026259428148820846, 'tGravityAcc_max_Y'), (0.025741230642989322, 'angle_X_gravityMean'), (0.025157251076694576, 'tGravityAcc_max_X'), (0.024265057133179307, 'angle_Y_gravityMean'), (0.018281255422245068, 'tGravityAcc_energy_Y')]
+Validation n=500
+test score: 0.910323709536
+oob score 0.98223450454
+test predict True 91.032 percent, 2081 out of 2286
+test predict False 8.968 percent, 205 out of 2286
+test predict probabilities head:
+ [[ 0.     0.     0.     0.51   0.43   0.06 ]
+ [ 0.     0.     0.     0.522  0.426  0.052]
+ [ 0.     0.     0.     0.532  0.438  0.03 ]
+ [ 0.     0.     0.     0.546  0.424  0.03 ]
+ [ 0.     0.     0.     0.648  0.334  0.018]]
+cross table:
+ predicted    1    2    3    4    5    6
+actual                                 
+1          362    0    0    0    0    0
+2            6  295    7    0   28    0
+3           16   49  243    0    0    0
+4            0    0    0  369   38    0
+5            0    0    0   61  370    0
+6            0    0    0    0    0  442
+precision [ 0.94270833  0.85755814  0.972       0.85813953  0.84862385  1.        ] 
+recall [ 1.          0.87797619  0.78896104  0.90663391  0.85846868  1.        ] 
+fbeta [ 0.97050938  0.86764706  0.87096774  0.88172043  0.85351788  1.        ] 
+support [362 336 308 407 431 442]
+n=500 fit: top ten important columns:
+ [(0.032903001375833477, 'tGravityAcc_min_X'), (0.032154713473257872, 'tGravityAcc_energy_X'), (0.031142921264374936, 'tGravityAcc_min_Y'), (0.029727224414925681, 'angle_X_gravityMean'), (0.026763081704717383, 'tGravityAcc_Mean_Y'), (0.025963873917116007, 'tGravityAcc_max_Y'), (0.025705487173923101, 'angle_Y_gravityMean'), (0.025090884614509486, 'tGravityAcc_max_X'), (0.024092958968801616, 'tGravityAcc_Mean_X'), (0.017529401931411941, 'tGravityAcc_energy_Y')]
+Validation n=100
+test score: 0.903762029746
+oob score 0.982826687722
+test predict True 90.376 percent, 2066 out of 2286
+test predict False 9.624 percent, 220 out of 2286
+test predict probabilities head:
+ [[ 0.    0.    0.    0.58  0.39  0.03]
+ [ 0.    0.    0.    0.56  0.42  0.02]
+ [ 0.    0.    0.    0.5   0.49  0.01]
+ [ 0.    0.    0.    0.55  0.44  0.01]
+ [ 0.    0.    0.    0.72  0.27  0.01]]
+cross table:
+ predicted    1    2    3    4    5    6
+actual                                 
+1          360    2    0    0    0    0
+2            6  290    8    1   31    0
+3           14   56  238    0    0    0
+4            0    0    0  369   38    0
+5            0    0    0   64  367    0
+6            0    0    0    0    0  442
+precision [ 0.94736842  0.83333333  0.96747967  0.85023041  0.84174312  1.        ] 
+recall [ 0.99447514  0.86309524  0.77272727  0.90663391  0.85150812  1.        ] 
+fbeta [ 0.9703504   0.84795322  0.85920578  0.87752675  0.84659746  1.        ] 
+support [362 336 308 407 431 442]
+n=100 fit: top ten important columns:
+ [(0.034751848883535795, 'tGravityAcc_Mean_X'), (0.031284782278621345, 'tGravityAcc_min_Y'), (0.028891297630841195, 'tGravityAcc_Mean_Y'), (0.028598610607318289, 'angle_X_gravityMean'), (0.027756890684782851, 'tGravityAcc_energy_X'), (0.026900428182414494, 'tGravityAcc_max_X'), (0.02532328726249965, 'angle_Y_gravityMean'), (0.020764763949838692, 'tGravityAcc_max_Y'), (0.020287880646652042, 'tGravityAcc_min_X'), (0.020224207605072913, 'tGravityAcc_energy_Y')]
+Validation n=200
+test score: 0.904636920385
+oob score 0.982629293328
+test predict True 90.464 percent, 2068 out of 2286
+test predict False 9.536 percent, 218 out of 2286
+test predict probabilities head:
+ [[ 0.     0.     0.     0.53   0.435  0.035]
+ [ 0.     0.     0.     0.555  0.4    0.045]
+ [ 0.     0.     0.     0.53   0.45   0.02 ]
+ [ 0.     0.     0.     0.545  0.435  0.02 ]
+ [ 0.     0.     0.     0.645  0.34   0.015]]
+cross table:
+ predicted    1    2    3    4    5    6
+actual                                 
+1          362    0    0    0    0    0
+2            8  292    7    0   29    0
+3           12   53  243    0    0    0
+4            0    0    0  369   38    0
+5            0    0    0   71  360    0
+6            0    0    0    0    0  442
+precision [ 0.94764398  0.84637681  0.972       0.83863636  0.84309133  1.        ] 
+recall [ 1.          0.86904762  0.78896104  0.90663391  0.83526682  1.        ] 
+fbeta [ 0.97311828  0.85756241  0.87096774  0.87131051  0.83916084  1.        ] 
+support [362 336 308 407 431 442]
+n=200 fit: top ten important columns:
+ [(0.034226498467180566, 'tGravityAcc_min_X'), (0.031746093344014771, 'tGravityAcc_Mean_X'), (0.031037591031498786, 'tGravityAcc_max_Y'), (0.030834745725488708, 'angle_X_gravityMean'), (0.028572213618630157, 'tGravityAcc_energy_X'), (0.028481541197308061, 'tGravityAcc_Mean_Y'), (0.027576364810114294, 'tGravityAcc_max_X'), (0.027050512522203776, 'angle_Y_gravityMean'), (0.023717337090132521, 'tGravityAcc_min_Y'), (0.018180043698877889, 'tGravityAcc_energy_Y')]
+Validation n=500
+test score: 0.905949256343
+oob score 0.983024082116
+test predict True 90.595 percent, 2071 out of 2286
+test predict False 9.405 percent, 215 out of 2286
+test predict probabilities head:
+ [[ 0.     0.     0.     0.506  0.454  0.04 ]
+ [ 0.     0.     0.     0.57   0.402  0.028]
+ [ 0.     0.     0.     0.514  0.474  0.012]
+ [ 0.     0.     0.     0.566  0.422  0.012]
+ [ 0.     0.     0.     0.67   0.324  0.006]]
+cross table:
+ predicted    1    2    3    4    5    6
+actual                                 
+1          362    0    0    0    0    0
+2            9  288    9    0   30    0
+3           14   48  246    0    0    0
 4            0    0    0  369   38    0
 5            0    0    0   67  364    0
 6            0    0    0    0    0  442
-precision [ 0.93298969  0.86646884  0.96456693  0.84633028  0.84848485  1.        ] 
-recall [ 1.          0.86904762  0.79545455  0.90663391  0.84454756  1.        ] 
-fbeta [ 0.96533333  0.86775632  0.87188612  0.87544484  0.84651163  1.        ] 
+precision [ 0.94025974  0.85714286  0.96470588  0.84633028  0.84259259  1.        ] 
+recall [ 1.          0.85714286  0.7987013   0.90663391  0.84454756  1.        ] 
+fbeta [ 0.96921017  0.85714286  0.87388988  0.87544484  0.84356895  1.        ] 
 support [362 336 308 407 431 442]
 n=500 fit: top ten important columns:
- [(0.032480384558332381, 'tGravityAcc_energy_X'), (0.03177943703059187, 'angle_X_gravityMean'), (0.030438669312508652, 'angle_Y_gravityMean'), (0.029999518945923589, 'tGravityAcc_Mean_Y'), (0.028963455193918793, 'tGravityAcc_Mean_X'), (0.027012825818389034, 'tGravityAcc_min_Y'), (0.026342519135164433, 'tGravityAcc_min_X'), (0.025075414001770338, 'tGravityAcc_max_Y'), (0.024010129313249518, 'tGravityAcc_max_X'), (0.015563763905356522, 'tGravityAcc_energy_Y')]
-Validation n=100
-test score: 0.904199475066
-oob score 0.979470983024
-test predict True 90.420 percent, 2067 out of 2286
-test predict False 9.580 percent, 219 out of 2286
-test predict probabilities head:
- [[ 0.    0.    0.    0.52  0.45  0.03]
- [ 0.    0.    0.    0.53  0.43  0.04]
- [ 0.    0.    0.    0.49  0.49  0.02]
- [ 0.    0.    0.    0.52  0.46  0.02]
- [ 0.    0.    0.    0.68  0.32  0.  ]]
-cross table:
- predicted    1    2    3    4    5    6
-actual                                 
-1          360    1    0    0    1    0
-2           10  291    7    3   25    0
-3           27   38  243    0    0    0
-4            0    0    0  369   38    0
-5            0    0    0   69  362    0
-6            0    0    0    0    0  442
-precision [ 0.90680101  0.88181818  0.972       0.83673469  0.84976526  1.        ] 
-recall [ 0.99447514  0.86607143  0.78896104  0.90663391  0.83990719  1.        ] 
-fbeta [ 0.9486166   0.87387387  0.87096774  0.87028302  0.84480747  1.        ] 
-support [362 336 308 407 431 442]
-n=100 fit: top ten important columns:
- [(0.034509901208137031, 'tGravityAcc_min_X'), (0.034498692477890051, 'tGravityAcc_max_Y'), (0.030466238119627485, 'tGravityAcc_energy_X'), (0.028689174284698818, 'tGravityAcc_energy_Y'), (0.028257178860565807, 'tGravityAcc_min_Y'), (0.028087584149906551, 'tGravityAcc_max_X'), (0.023818792597625635, 'tGravityAcc_Mean_Y'), (0.020337773584149409, 'tGravityAcc_Mean_X'), (0.020211183508457072, 'angle_X_gravityMean'), (0.017747315119425785, 'angle_Y_gravityMean')]
-Validation n=200
-test score: 0.909011373578
-oob score 0.982431898934
-test predict True 90.901 percent, 2078 out of 2286
-test predict False 9.099 percent, 208 out of 2286
-test predict probabilities head:
- [[ 0.     0.     0.     0.505  0.44   0.055]
- [ 0.     0.     0.     0.55   0.42   0.03 ]
- [ 0.     0.     0.     0.585  0.385  0.03 ]
- [ 0.     0.     0.     0.58   0.385  0.035]
- [ 0.     0.     0.     0.675  0.315  0.01 ]]
-cross table:
- predicted    1    2    3    4    5    6
-actual                                 
-1          362    0    0    0    0    0
-2            2  297   10    0   27    0
-3           17   48  243    0    0    0
-4            0    0    0  369   38    0
-5            0    0    0   66  365    0
-6            0    0    0    0    0  442
-precision [ 0.95013123  0.86086957  0.96047431  0.84827586  0.84883721  1.        ] 
-recall [ 1.          0.88392857  0.78896104  0.90663391  0.84686775  1.        ] 
-fbeta [ 0.97442799  0.8722467   0.86631016  0.87648456  0.84785134  1.        ] 
-support [362 336 308 407 431 442]
-n=200 fit: top ten important columns:
- [(0.03758999235499122, 'tGravityAcc_Mean_X'), (0.034202443281228248, 'angle_Y_gravityMean'), (0.031194194347511552, 'tGravityAcc_max_X'), (0.028939751999945789, 'angle_X_gravityMean'), (0.026251886159374328, 'tGravityAcc_Mean_Y'), (0.023346244724692995, 'tGravityAcc_min_X'), (0.023139016538416674, 'tGravityAcc_max_Y'), (0.022173951383962168, 'tGravityAcc_energy_X'), (0.021112050299301983, 'tGravityAcc_min_Y'), (0.020577264392488151, 'tGravityAcc_energy_Y')]
-Validation n=500
-test score: 0.908573928259
-oob score 0.984800631662
-test predict True 90.857 percent, 2077 out of 2286
-test predict False 9.143 percent, 209 out of 2286
-test predict probabilities head:
- [[ 0.     0.     0.     0.526  0.442  0.032]
- [ 0.     0.     0.     0.492  0.48   0.028]
- [ 0.     0.     0.     0.5    0.48   0.02 ]
- [ 0.     0.     0.     0.548  0.442  0.01 ]
- [ 0.     0.     0.     0.602  0.394  0.004]]
-cross table:
- predicted    1    2    3    4    5    6
-actual                                 
-1          361    0    0    0    1    0
-2            6  292   10    0   28    0
-3           14   49  245    0    0    0
-4            0    0    0  369   38    0
-5            0    0    0   63  368    0
-6            0    0    0    0    0  442
-precision [ 0.94750656  0.85630499  0.96078431  0.85416667  0.84597701  1.        ] 
-recall [ 0.99723757  0.86904762  0.79545455  0.90663391  0.85382831  1.        ] 
-fbeta [ 0.9717362   0.86262925  0.87033748  0.87961859  0.84988453  1.        ] 
-support [362 336 308 407 431 442]
-n=500 fit: top ten important columns:
- [(0.031846828532530791, 'tGravityAcc_min_X'), (0.031454211453712119, 'tGravityAcc_Mean_X'), (0.030533579858542562, 'angle_X_gravityMean'), (0.029646421661673285, 'tGravityAcc_energy_X'), (0.029618175893719709, 'tGravityAcc_min_Y'), (0.027368481117891405, 'angle_Y_gravityMean'), (0.026142011432518489, 'tGravityAcc_max_Y'), (0.026140678930441471, 'tGravityAcc_Mean_Y'), (0.024354890523199026, 'tGravityAcc_max_X'), (0.020765691201860774, 'tGravityAcc_energy_Y')]
-scores mean 0.90595, std 0.00129
-oobs mean 0.98019, std 0.00089
+ [(0.032580934133138256, 'tGravityAcc_min_X'), (0.031805418343887906, 'angle_X_gravityMean'), (0.030743037284581325, 'tGravityAcc_energy_X'), (0.029960505355752717, 'angle_Y_gravityMean'), (0.029639963352080953, 'tGravityAcc_Mean_Y'), (0.028718525816164304, 'tGravityAcc_Mean_X'), (0.028124647522412373, 'tGravityAcc_max_Y'), (0.027172311197115395, 'tGravityAcc_min_Y'), (0.025076659261297554, 'tGravityAcc_max_X'), (0.01751459170078146, 'tGravityAcc_energy_Y')]
+scores mean 0.90784, std 0.00291
+oobs mean 0.98079, std 0.00146
 Test model fit
-test score: 0.913810654903
-oob score 0.983418870904
-test predict True 91.381 percent, 2693 out of 2947
-test predict False 8.619 percent, 254 out of 2947
+test score: 0.911435357991
+oob score 0.980852743782
+test predict True 91.144 percent, 2686 out of 2947
+test predict False 8.856 percent, 261 out of 2947
 test predict probabilities head:
- [[ 0.    0.    0.    0.09  0.91  0.  ]
- [ 0.    0.    0.    0.08  0.92  0.  ]
- [ 0.    0.    0.    0.04  0.95  0.01]
- [ 0.    0.    0.    0.02  0.97  0.01]
- [ 0.    0.    0.    0.01  0.99  0.  ]]
+ [[ 0.    0.    0.    0.12  0.88  0.  ]
+ [ 0.    0.    0.    0.17  0.83  0.  ]
+ [ 0.    0.    0.    0.05  0.95  0.  ]
+ [ 0.    0.    0.    0.04  0.96  0.  ]
+ [ 0.    0.    0.    0.    1.    0.  ]]
 cross table:
  predicted    1    2    3    4    5    6
 actual                                 
-1          485    3    8    0    0    0
-2           67  398    6    0    0    0
-3           38   35  347    0    0    0
+1          483    4    9    0    0    0
+2           65  400    6    0    0    0
+3           40   40  340    0    0    0
 4            0    0    0  450   41    0
 5            0    0    0   56  476    0
 6            0    0    0    0    0  537
-precision [ 0.8220339   0.91284404  0.96121884  0.88932806  0.92069632  1.        ] 
-recall [ 0.97782258  0.84501062  0.82619048  0.91649695  0.89473684  1.        ] 
-fbeta [ 0.893186    0.87761852  0.88860435  0.90270812  0.90753098  1.        ] 
+precision [ 0.82142857  0.9009009   0.95774648  0.88932806  0.92069632  1.        ] 
+recall [ 0.97379032  0.8492569   0.80952381  0.91649695  0.89473684  1.        ] 
+fbeta [ 0.89114391  0.87431694  0.87741935  0.90270812  0.90753098  1.        ] 
 support [496 471 420 491 532 537]
 Test model fit: top ten important columns:
- [(0.034738078768757175, 'tGravityAcc_Mean_Y'), (0.033366142265392522, 'tGravityAcc_max_X'), (0.029965168102291013, 'tGravityAcc_min_Y'), (0.029090027272602622, 'tGravityAcc_energy_X'), (0.028600986878203654, 'tGravityAcc_min_X'), (0.026378941711410614, 'angle_X_gravityMean'), (0.025815165667586043, 'tGravityAcc_max_Y'), (0.024394108818821002, 'tGravityAcc_Mean_X'), (0.024080030982168567, 'tGravityAcc_energy_Y'), (0.023467364010107374, 'angle_Y_gravityMean')]
-test score: 0.914149983034
-oob score 0.982431898934
-test predict True 91.415 percent, 2694 out of 2947
-test predict False 8.585 percent, 253 out of 2947
-test predict probabilities head:
- [[ 0.    0.    0.    0.05  0.94  0.01]
- [ 0.    0.    0.    0.11  0.89  0.  ]
- [ 0.    0.    0.    0.08  0.92  0.  ]
- [ 0.    0.    0.    0.07  0.93  0.  ]
- [ 0.    0.    0.    0.04  0.96  0.  ]]
-cross table:
- predicted    1    2    3    4    5    6
-actual                                 
-1          483    2   11    0    0    0
-2           63  401    7    0    0    0
-3           37   40  343    0    0    0
-4            0    0    0  453   38    0
-5            0    0    0   55  477    0
-6            0    0    0    0    0  537
-precision [ 0.82847341  0.90519187  0.9501385   0.89173228  0.92621359  1.        ] 
-recall [ 0.97379032  0.85138004  0.81666667  0.92260692  0.89661654  1.        ] 
-fbeta [ 0.8952734   0.87746171  0.87836108  0.90690691  0.91117479  1.        ] 
-support [496 471 420 491 532 537]
-Test model fit: top ten important columns:
- [(0.034651071437070566, 'tGravityAcc_Mean_X'), (0.033801663696236689, 'tGravityAcc_energy_X'), (0.031343666806435647, 'angle_Y_gravityMean'), (0.029362538737858466, 'tGravityAcc_min_X'), (0.029332629996424053, 'tGravityAcc_Mean_Y'), (0.029080373477579941, 'tGravityAcc_min_Y'), (0.028182627471696056, 'angle_X_gravityMean'), (0.023007714227117712, 'tGravityAcc_max_X'), (0.021849919971403269, 'tGravityAcc_energy_Y'), (0.016313949415668227, 'tGravityAcc_max_Y')]
-test score: 0.907024092297
-oob score 0.980457954994
-test predict True 90.702 percent, 2673 out of 2947
-test predict False 9.298 percent, 274 out of 2947
+ [(0.035974001500658097, 'tGravityAcc_min_X'), (0.035048578844476527, 'tGravityAcc_energy_X'), (0.032965924157016532, 'angle_Y_gravityMean'), (0.031841730966621073, 'angle_X_gravityMean'), (0.029964795203033003, 'tGravityAcc_min_Y'), (0.026321829355705414, 'tGravityAcc_max_X'), (0.025306364969166949, 'tGravityAcc_max_Y'), (0.023645770599249761, 'tGravityAcc_Mean_X'), (0.022269607062920704, 'fAccJerk_Std_X'), (0.019531902970190897, 'tGravityAcc_energy_Y')]
+test score: 0.915167967424
+oob score 0.981444926964
+test predict True 91.517 percent, 2697 out of 2947
+test predict False 8.483 percent, 250 out of 2947
 test predict probabilities head:
  [[ 0.    0.    0.    0.12  0.87  0.01]
- [ 0.    0.    0.    0.13  0.87  0.  ]
- [ 0.    0.    0.    0.07  0.92  0.01]
- [ 0.    0.    0.    0.04  0.94  0.02]
- [ 0.    0.    0.    0.01  0.99  0.  ]]
+ [ 0.    0.    0.    0.16  0.84  0.  ]
+ [ 0.    0.    0.    0.12  0.88  0.  ]
+ [ 0.    0.    0.    0.05  0.94  0.01]
+ [ 0.    0.    0.    0.    1.    0.  ]]
 cross table:
  predicted    1    2    3    4    5    6
 actual                                 
-1          480   11    5    0    0    0
-2           70  395    6    0    0    0
-3           45   36  339    0    0    0
-4            0    0    0  447   44    0
-5            0    0    0   57  475    0
+1          485    6    5    0    0    0
+2           64  402    5    0    0    0
+3           41   40  339    0    0    0
+4            0    0    0  453   38    0
+5            0    0    0   51  481    0
 6            0    0    0    0    0  537
-precision [ 0.80672269  0.89366516  0.96857143  0.88690476  0.91522158  1.        ] 
-recall [ 0.96774194  0.83864119  0.80714286  0.91038697  0.89285714  1.        ] 
-fbeta [ 0.87992667  0.8652793   0.88051948  0.89849246  0.90390105  1.        ] 
+precision [ 0.8220339   0.89732143  0.9713467   0.89880952  0.92678227  1.        ] 
+recall [ 0.97782258  0.85350318  0.80714286  0.92260692  0.90413534  1.        ] 
+fbeta [ 0.893186    0.87486398  0.8816645   0.91055276  0.91531874  1.        ] 
 support [496 471 420 491 532 537]
 Test model fit: top ten important columns:
- [(0.034241761229380233, 'tGravityAcc_min_X'), (0.02999649031554796, 'angle_X_gravityMean'), (0.028861894302201617, 'tGravityAcc_Mean_Y'), (0.026304307886111541, 'tGravityAcc_energy_X'), (0.026285501380134402, 'tGravityAcc_Mean_X'), (0.026226028762744144, 'tGravityAcc_max_X'), (0.024162060251620474, 'angle_Y_gravityMean'), (0.024158738532128257, 'tGravityAcc_max_Y'), (0.021618176424942862, 'tGravityAcc_min_Y'), (0.017171587456620022, 'tGravityAcc_energy_Y')]
+ [(0.043230504793001556, 'tGravityAcc_Mean_X'), (0.035499094575233571, 'tGravityAcc_min_X'), (0.029712483959903488, 'angle_X_gravityMean'), (0.02935512558151876, 'tGravityAcc_Mean_Y'), (0.027642756357766446, 'tGravityAcc_min_Y'), (0.025691330337750423, 'tGravityAcc_max_Y'), (0.024097444333011645, 'angle_Y_gravityMean'), (0.021679468139035825, 'tGravityAcc_energy_X'), (0.019191222524097683, 'tGravityAcc_max_X'), (0.014550394814954824, 'fAccJerk_Std_X')]
+test score: 0.917203936206
+oob score 0.97828661666
+test predict True 91.720 percent, 2703 out of 2947
+test predict False 8.280 percent, 244 out of 2947
+test predict probabilities head:
+ [[ 0.    0.    0.    0.1   0.88  0.02]
+ [ 0.    0.    0.    0.1   0.9   0.  ]
+ [ 0.    0.    0.    0.06  0.94  0.  ]
+ [ 0.    0.    0.    0.05  0.95  0.  ]
+ [ 0.    0.    0.    0.    1.    0.  ]]
+cross table:
+ predicted    1    2    3    4    5    6
+actual                                 
+1          481    6    9    0    0    0
+2           60  405    6    0    0    0
+3           31   45  344    0    0    0
+4            0    0    0  454   37    0
+5            0    0    0   50  482    0
+6            0    0    0    0    0  537
+precision [ 0.84090909  0.88815789  0.95821727  0.90079365  0.92870906  1.        ] 
+recall [ 0.96975806  0.85987261  0.81904762  0.92464358  0.90601504  1.        ] 
+fbeta [ 0.90074906  0.87378641  0.88318357  0.91256281  0.91722169  1.        ] 
+support [496 471 420 491 532 537]
+Test model fit: top ten important columns:
+ [(0.037828826667697761, 'tGravityAcc_energy_X'), (0.035047435251889941, 'tGravityAcc_max_Y'), (0.034265349357317773, 'tGravityAcc_min_Y'), (0.031437549087515684, 'tGravityAcc_Mean_Y'), (0.024904762807709303, 'tGravityAcc_max_X'), (0.024112068692891637, 'tGravityAcc_min_X'), (0.022308357819610727, 'tGravityAcc_Mean_X'), (0.021294694168839619, 'tGravityAcc_energy_Y'), (0.020900950283000513, 'angle_X_gravityMean'), (0.019282448554326873, 'angle_Y_gravityMean')]
 activity labels:                   act
 0                    
 1             WALKING
@@ -629,5 +629,5 @@ activity labels:                   act
 4             SITTING
 5            STANDING
 6              LAYING
-scores mean 0.91166, std 0.00328
-oobs mean 0.98210, std 0.00123
+scores mean 0.91460, std 0.00239
+oobs mean 0.98019, std 0.00137

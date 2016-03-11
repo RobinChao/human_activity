@@ -256,8 +256,10 @@ def plotHistograms(dftrain, dftrain_y, plotdir):
 # only works if one parameter explored
 def gridscore_boxplot(gslist, plotdir, label, xlabel):
     vals = list(map(lambda e: e.cv_validation_scores, gslist))
-    labs = list(map(lambda e: list(e.parameters.values())[0], gslist))
-    labs = list(map(lambda e: 'None' if e==None else e, labs))
+#    labs = list(map(lambda e: list(e.parameters.values())[0], gslist))
+#    labs = list(map(lambda e: 'None' if e==None else e, labs))
+    labs = list(map(lambda e: list(e.parameters.values()), gslist))
+    labs = list(map(lambda e: str(e[0]), labs))
     plt.clf()
     plt.boxplot(vals, labels=labs)
     plt.title("Human Activity Predicted by Random Forest")
