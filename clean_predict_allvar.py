@@ -77,9 +77,8 @@ if __name__ == '__main__':
     subjtest = set(list(dftest['subject']))
     print("train subject set ( size", len(subjtrain), ")", subjtrain)
     print("test subject set ( size", len(subjtest), ")", subjtest)
-# the thing is, raw train, test data is in separate files, different subjects
+# raw train, test data is in separate files, different subjects
 # let's do quick and easy way: train>=27, test<=6, validate>=21 <27
-#   within current data, don't merge train w/ test
 
     # add subject to y's before split
     dftrain_y['subject'] = dftrain['subject']
@@ -88,32 +87,14 @@ if __name__ == '__main__':
     dfvalid = getValidationData(dftrain)     # six subjects total
     dfvalid_y = getValidationData(dftrain_y)
     dfvalid_y = dfvalid_y.drop('subject', axis=1)
-#    print("dfvalid shape head", dfvalid.shape, "\n", dfvalid[:2])
-#    print("dfvalid_y shape head", dfvalid_y.shape, "\n", dfvalid_y[:2])
     print("dfvalid shape head", dfvalid.shape)
     print("dfvalid_y shape head", dfvalid_y.shape)
     
     dftest = dftest[dftest['subject'] < 14]  # six subjects total
     dftest_y = dftest_y[dftest_y['subject'] < 14]
     dftest_y = dftest_y.drop('subject', axis=1)
-#    print("dftest shape head", dftest.shape, "\n", dftest[:2])
-#    print("dftest_y shape head", dftest_y.shape, "\n", dftest_y[:2])
     print("dftest shape head", dftest.shape)
     print("dftest_y shape head", dftest_y.shape)
-    
-    # swap dfvalid, dftest, see if fits are different
-# makes almost no difference: GridSearch 0.94, test score 0.77
-#    dfsave = pd.DataFrame( dfvalid )
-#    dfsave_y = pd.DataFrame( dfvalid_y )
-#    dfvalid = pd.DataFrame( dftest )
-#    dfvalid_y = pd.DataFrame( dftest_y )
-#    dftest = pd.DataFrame( dfsave )
-#    dftest_y = pd.DataFrame( dfsave_y )
-#    
-#    print("\ndfvalid shape head", dfvalid.shape)
-#    print("dfvalid_y shape head", dfvalid_y.shape)
-#    print("dftest shape head", dftest.shape)
-#    print("dftest_y shape head", dftest_y.shape)
     
     dftrain = dftrain[dftrain['subject'] >= 27]  # four subjects total
     dftrain_y = dftrain_y[dftrain_y['subject'] >= 27]
@@ -137,21 +118,6 @@ if __name__ == '__main__':
     print("Valid oobs mean, std", np.mean(oobs), np.std(oobs))
     # about 0.83
     
-#    print("** Testing n_estimators=100, max_features=sqrt")
-#    scores = []
-#    oobs = []
-#    for i in list(range(5)):  # average of five
-#        print("Test 100 sqrt")
-#        clf = RandomForestClassifier(n_estimators=100, max_features='sqrt', oob_score=True)
-#        score, imp, oob = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
-#        impcol = getImportantColumns(dftrain.columns, imp)
-#        print("opt fit: top ten important columns:\n", impcol[:10])
-#        scores.append(score)
-#        oobs.append(oob)
-#
-#    print("** Test scores mean, std", np.mean(scores), np.std(scores))
-#    print("** Test oobs mean, std", np.mean(oobs), np.std(oobs))
-    
     clf = RandomForestClassifier(n_estimators=100, oob_score=True)
     # don't need to split train, valid
     scores = cross_validation.cross_val_score(clf, \
@@ -166,37 +132,17 @@ if __name__ == '__main__':
     gs = GridSearchCV(estimator=clf, param_grid=param_grid, cv=5, \
       verbose=1, n_jobs=-1, scoring='accuracy')    # verbose=10
     # scoring='accuracy', 'f1_weighted', 'precision_weighted'
-# Please set an explicit value for `average`, one of (None, 'micro',
-#   'macro', 'weighted', 'samples'). In cross validation use, for 
-#   instance, scoring="f1_weighted" instead of scoring="f1".
-# ValueError: 'weighted' is not a valid scoring value. Valid options
-# are ['accuracy', 'adjusted_rand_score', 'average_precision', 'f1',
-# 'f1_macro', 'f1_micro', 'f1_samples', 'f1_weighted', 'log_loss',
-# 'mean_absolute_error', 'mean_squared_error', 'median_absolute_error',
-# 'precision', 'precision_macro', 'precision_micro', 'precision_samples',
-# 'precision_weighted', 'r2', 'recall', 'recall_macro', 'recall_micro',
-# 'recall_samples', 'recall_weighted', 'roc_auc']
     
-    # shorten for tests: oob=T/F, swap dfvalid, dftest
-#    clf = RandomForestClassifier(oob_score=True)  # n_estimators=50
-#    param_grid = [{'n_estimators': [50, 100], \
-#      'max_features': ['sqrt', 'log2'] }]
-#    gs = GridSearchCV(estimator=clf, param_grid=param_grid, cv=3, \
-#      verbose=1, n_jobs=-1)    # verbose=10
-    
-    # after GridSearch, which params are used for fit, predict?
     gs.fit(dftrain, dftrain_y['Y'])  # fits all training parameters
     print("gs grid scores\n", gs.grid_scores_)
     print("gs best score %.4f %s\n%s" % \
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
-#    print("gs params", gs.get_params())
     # all mean within 2 * std of each other, best not meaningful 
     gridscoreBoxplot2(gs.grid_scores_, plotdir, "multi_opt", "oob_score=True")
     
-    # for test, use optimum validation params, get stats on it
 #   clf = gs.best_estimator_
-#     n_estimators < 100 insufficient
-#     max_features=log2 misleading, better on train than validation / test
+#     n_estimators = 100 sufficient, more about the same
+#     max_features=log2 not much different than auto
 #   set optimum by hand
     
     print("validating optimum params")
@@ -213,33 +159,30 @@ if __name__ == '__main__':
     print("Valid scores mean, std", np.mean(scores), np.std(scores))
     print("Valid oobs mean, std", np.mean(oobs), np.std(oobs))    
     
-#    print("testing optimum params")
-#    scores = []
-#    oobs = []
-#    for i in list(range(5)):  # average of five
-#        print("Test optimum")
-#        clf = RandomForestClassifier(n_estimators=100, max_features='sqrt', oob_score=True)
-#        score, imp, oob = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
-#        impcol = getImportantColumns(dftrain.columns, imp)
-#        print("opt fit: top ten important columns:\n", impcol[:10])
-#        scores.append(score)
-#        oobs.append(oob)
-#    print("Test scores mean, std", np.mean(scores), np.std(scores))
-#    print("Test oobs mean, std", np.mean(oobs), np.std(oobs))
+    print("testing optimum params")
+    scores = []
+    oobs = []
+    for i in list(range(5)):  # average of five
+        print("Test optimum")
+        clf = RandomForestClassifier(n_estimators=100, max_features='sqrt', oob_score=True)
+        score, imp, oob = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
+        impcol = getImportantColumns(dftrain.columns, imp)
+        print("opt fit: top ten important columns:\n", impcol[:10])
+        scores.append(score)
+        oobs.append(oob)
+    print("Test scores mean, std", np.mean(scores), np.std(scores))
+    print("Test oobs mean, std", np.mean(oobs), np.std(oobs))
 
-# use clf from clf.fit(dfvalid) not clf.fit(dftest)
-    new_y = clf.predict(dftest)  # uses last clf.fit()
+#   get classification report, confusion matrix on last fit
+    new_y = clf.predict(dftest)
     print("clf score %.4f (%d of %d)" % (clf.score(dftest, dftest_y['Y']), \
       sum(new_y == dftest_y['Y']), dftest_y.shape[0] ))
     print("\nclassification_report\n", classification_report(dftest_y['Y'], new_y))
     cm = confusion_matrix(dftest_y['Y'], new_y)
     plotConfusionMatrix(cm, plotdir, 'opt', list(sorted(set(dftest_y['Y']))))
 
-# end output copied
-
-# find original labels of importances
-#  could do for each in opt list, take set intersection of top 10
-#  but almost no difference in opt parameters, just get a sense of it
+#   find original labels of importances
+#   for last test fit, just get a sense of it
     impcol2 = getImportantColumns(dfcol['label2'], imp)
     print("Top ten importances of last opt fit, by original name:\n", \
         list(map(lambda e: e[1], impcol2))[:10] )

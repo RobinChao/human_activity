@@ -174,10 +174,10 @@ def rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y):
         print("oob score", clfit.oob_score_)
     
     # calculate test score by other means
-    print("test predict True %.3f percent, %d out of %d" % \
+    print("predict True %.3f percent, %d out of %d" % \
       ((100 * sum(dftest_y['Y'] == new_y) / dftest_y.shape[0]), \
        sum(dftest_y['Y'] == new_y), dftest_y.shape[0]))
-    print("test predict False %.3f percent, %d out of %d" % \
+    print("predict False %.3f percent, %d out of %d" % \
       ((100 * sum(dftest_y['Y'] != new_y) / dftest_y.shape[0]), \
        sum(dftest_y['Y'] != new_y), dftest_y.shape[0]))
     
@@ -190,8 +190,6 @@ def rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y):
         rownames=['actual'], colnames=['predicted'])
     print("cross table:\n", ptab)
     
-    # how does it know true/false positives, true/false negatives?
-    # priors all equal, Y's 1/6?  maybe from confusion matrix?
     # accuracy: percent labeled correctly
     # precision: true positives / (true positives + true negatives)
     # recall:    true positives / (true positives + false negatives)
@@ -256,8 +254,6 @@ def plotHistograms(dftrain, dftrain_y, plotdir):
 # only works if one parameter explored
 def gridscoreBoxplot(gslist, plotdir, label, xlabel):
     vals = list(map(lambda e: e.cv_validation_scores, gslist))
-#    labs = list(map(lambda e: list(e.parameters.values())[0], gslist))
-#    labs = list(map(lambda e: 'None' if e==None else e, labs))
     labs = list(map(lambda e: list(e.parameters.values()), gslist))
     labs = list(map(lambda e: str(e[0]), labs))
     plt.clf()
@@ -343,21 +339,21 @@ if __name__ == '__main__':
     
     # plot importances, curve better defined for higher n_est
     print("Validation n=100")
-    clf = RandomForestClassifier(n_estimators=100)
+    clf = RandomForestClassifier(n_estimators=100, max_features='auto')
     score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
     impcol = getImportantColumns(dftrain.columns, imp)
     print("n=100 fit: top ten important columns:\n", impcol[:10])
     plotImportances(impcol, plotdir, "vb100")  # score 0.9073
     
     print("Validation n=200")
-    clf = RandomForestClassifier(n_estimators=200)
+    clf = RandomForestClassifier(n_estimators=200, max_features='auto')
     score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
     impcol = getImportantColumns(dftrain.columns, imp)
     print("n=200 fit: top ten important columns:\n", impcol[:10])
     plotImportances(impcol, plotdir, "vb200")  # score 0.9068
     
     print("Validation n=500")
-    clf = RandomForestClassifier(n_estimators=500)
+    clf = RandomForestClassifier(n_estimators=500, max_features='auto')
     score, imp = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
     impcol = getImportantColumns(dftrain.columns, imp)
     print("n=500 fit: top ten important columns:\n", impcol[:10])
@@ -368,7 +364,7 @@ if __name__ == '__main__':
     oobs = []
     for i in list(range(3)):  # average of three
         print("Validation n=100")
-        clf = RandomForestClassifier(n_estimators=100, oob_score=True)
+        clf = RandomForestClassifier(n_estimators=100, max_features='auto', oob_score=True)
         score, imp, oob = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
         impcol = getImportantColumns(dftrain.columns, imp)
         print("n=100 fit: top ten important columns:\n", impcol[:10])
@@ -376,19 +372,19 @@ if __name__ == '__main__':
         oobs.append(oob)
         
         print("Validation n=200")
-        clf = RandomForestClassifier(n_estimators=200, oob_score=True)
+        clf = RandomForestClassifier(n_estimators=200, max_features='auto', oob_score=True)
         score, imp, oob = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
         impcol = getImportantColumns(dftrain.columns, imp)
         print("n=200 fit: top ten important columns:\n", impcol[:10])
         
         print("Validation n=500")
-        clf = RandomForestClassifier(n_estimators=500, oob_score=True)
+        clf = RandomForestClassifier(n_estimators=500, max_features='auto', oob_score=True)
         score, imp, oob = rfFitScore(clf, dftrain, dftrain_y, dfvalid, dfvalid_y)
         impcol = getImportantColumns(dftrain.columns, imp)
         print("n=500 fit: top ten important columns:\n", impcol[:10])
     
-    print("scores mean %.5f, std %.5f" % (np.mean(scores), np.std(scores)))
-    print("oobs mean %.5f, std %.5f" % (np.mean(oobs), np.std(oobs)))
+    print("valid scores mean %.5f, std %.5f" % (np.mean(scores), np.std(scores)))
+    print("valid oobs mean %.5f, std %.5f" % (np.mean(oobs), np.std(oobs)))
     
     new_y = clf.predict(dftest)  # uses last clf.fit()
     print("clf score %.4f (%d of %d)" % (clf.score(dftest, dftest_y['Y']), \
@@ -396,17 +392,31 @@ if __name__ == '__main__':
 
     scores = []
     oobs = []
-    # test optimum params with dftest
+    # predict optimum params with dftest
     print("Test model fit")
     for i in list(range(3)):  # average of three
-        clf = RandomForestClassifier(n_estimators=100, oob_score=True)
+        clf = RandomForestClassifier(n_estimators=100, max_features='auto', oob_score=True)
         score, imp, oob = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
         impcol = getImportantColumns(dftrain.columns, imp)
         print("Test model fit: top ten important columns:\n", impcol[:10])
         scores.append(score)
         oobs.append(oob)
+    print("test auto scores mean %.5f, std %.5f" % (np.mean(scores), np.std(scores)))
+    print("test auto oobs mean %.5f, std %.5f" % (np.mean(oobs), np.std(oobs)))
 
-    print("activity labels:", readActivityLabels())
-    print("scores mean %.5f, std %.5f" % (np.mean(scores), np.std(scores)))
-    print("oobs mean %.5f, std %.5f" % (np.mean(oobs), np.std(oobs)))
+    scores = []
+    oobs = []
+    # predict optimum params with dftest
+    print("Test model fit")
+    for i in list(range(3)):  # average of three
+        clf = RandomForestClassifier(n_estimators=100, max_features='log2', oob_score=True)
+        score, imp, oob = rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y)
+        impcol = getImportantColumns(dftrain.columns, imp)
+        print("Test model fit: top ten important columns:\n", impcol[:10])
+        scores.append(score)
+        oobs.append(oob)
+    print("test log2 scores mean %.5f, std %.5f" % (np.mean(scores), np.std(scores)))
+    print("test log2 oobs mean %.5f, std %.5f" % (np.mean(oobs), np.std(oobs)))
+
+    print("activity labels:\n", readActivityLabels())
 
