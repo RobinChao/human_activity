@@ -135,7 +135,7 @@ def readRawData(dfcol, printOut=False):
     dftest, dftest_y = readRawTestData(dfcol, dfact, printOut)
     return dftrain, dftrain_y, dftest, dftest_y
 
-def check_duplicate_columns(dfcol, dups):
+def checkDuplicateColumns(dfcol, dups):
     '''check duplicate columns'''
     print("DUPS, len =", len(dups))
     for dup in dups:
@@ -181,9 +181,9 @@ def rfFitScore(clf, dftrain, dftrain_y, dftest, dftest_y):
       ((100 * sum(dftest_y['Y'] != new_y) / dftest_y.shape[0]), \
        sum(dftest_y['Y'] != new_y), dftest_y.shape[0]))
     
-    new_p = clfit.predict_proba( dftest )
-    # probability of each X variable to predict each y class
-    print("test predict probabilities head:\n", new_p[:5])
+#    new_p = clfit.predict_proba( dftest )
+#    # probability of each X variable to predict each y class
+#    print("test predict probabilities head:\n", new_p[:5])
     
     # cross table of variable predictions
     ptab = pd.crosstab(dftest_y['Y'], new_y, \
@@ -254,7 +254,7 @@ def plotHistograms(dftrain, dftrain_y, plotdir):
         plt.savefig(plotdir + "hist_" + label)
 
 # only works if one parameter explored
-def gridscore_boxplot(gslist, plotdir, label, xlabel):
+def gridscoreBoxplot(gslist, plotdir, label, xlabel):
     vals = list(map(lambda e: e.cv_validation_scores, gslist))
 #    labs = list(map(lambda e: list(e.parameters.values())[0], gslist))
 #    labs = list(map(lambda e: 'None' if e==None else e, labs))
@@ -262,7 +262,7 @@ def gridscore_boxplot(gslist, plotdir, label, xlabel):
     labs = list(map(lambda e: str(e[0]), labs))
     plt.clf()
     plt.boxplot(vals, labels=labs)
-    plt.title("Human Activity Predicted by Random Forest")
+    plt.title("Human Activity Fitted by Random Forest")
     plt.xlabel(label + " (with " + xlabel + ")")
     plt.ylabel("Fraction Correct")
     plt.savefig(plotdir + "gridscore_" + label)
@@ -318,13 +318,13 @@ if __name__ == '__main__':
     gs = GridSearchCV(estimator=clf, param_grid=param_grid, cv=3, \
       verbose=1, n_jobs=-1)    # verbose=10
     gs.fit(dftrain, dftrain_y['Y'])
-    new_y = gs.predict(dfvalid)
-    print("gs score %.5f (%d of %d)" % (gs.score(dfvalid, dfvalid_y['Y']), \
-      sum(new_y == dfvalid_y['Y']), dfvalid_y.shape[0] ))
     print("gs grid scores\n", gs.grid_scores_)
     print("gs best score %.5f %s\n%s" % \
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
-    gridscore_boxplot(gs.grid_scores_, plotdir, "n_estimators", "max_features=sqrt")
+    gridscoreBoxplot(gs.grid_scores_, plotdir, "n_estimators", "max_features=sqrt")
+    new_y = gs.predict(dfvalid)  # predict on gs.best_params_
+    print("gs score %.5f (%d of %d)" % (gs.score(dfvalid, dfvalid_y['Y']), \
+      sum(new_y == dfvalid_y['Y']), dfvalid_y.shape[0] ))
     
     # find optimum max_features if possible  # sqrt(478)~22 log2(478)~9
     clf = RandomForestClassifier(n_estimators=100)
@@ -333,13 +333,13 @@ if __name__ == '__main__':
     gs = GridSearchCV(estimator=clf, param_grid=param_grid, cv=3, \
       verbose=1, n_jobs=-1)    # verbose=10
     gs.fit(dftrain, dftrain_y['Y'])
-    new_y = gs.predict(dfvalid)
-    print("gs score %.5f (%d of %d)" % (gs.score(dfvalid, dfvalid_y['Y']), \
-      sum(new_y == dfvalid_y['Y']), dfvalid_y.shape[0] ))
     print("gs grid scores\n", gs.grid_scores_)
     print("gs best score %.5f %s\n%s" % \
       (gs.best_score_, gs.best_params_, gs.best_estimator_))
-    gridscore_boxplot(gs.grid_scores_, plotdir, "max_features", "n_estimators=100")
+    gridscoreBoxplot(gs.grid_scores_, plotdir, "max_features", "n_estimators=100")
+    new_y = gs.predict(dfvalid)  # predict on gs.best_params_
+    print("gs score %.5f (%d of %d)" % (gs.score(dfvalid, dfvalid_y['Y']), \
+      sum(new_y == dfvalid_y['Y']), dfvalid_y.shape[0] ))
     
     # plot importances, curve better defined for higher n_est
     print("Validation n=100")
@@ -389,6 +389,10 @@ if __name__ == '__main__':
     
     print("scores mean %.5f, std %.5f" % (np.mean(scores), np.std(scores)))
     print("oobs mean %.5f, std %.5f" % (np.mean(oobs), np.std(oobs)))
+    
+    new_y = clf.predict(dftest)  # uses last clf.fit()
+    print("clf score %.4f (%d of %d)" % (clf.score(dftest, dftest_y['Y']), \
+      sum(new_y == dftest_y['Y']), dftest_y.shape[0] ))
 
     scores = []
     oobs = []
