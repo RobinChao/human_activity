@@ -17,21 +17,23 @@ from read_clean_data import readRawColumns, readRawData
 from clean_predict_allvar import renameColumns
 
 
-def getPlotDir():
-    sns.set_style("darkgrid")
+def get_plotdir():
     plotdir = "human_activity_pca_plots/"
+    return plotdir
+
+def make_plotdir():
+    sns.set_style("darkgrid")
+    plotdir = get_plotdir()
     if not os.access(plotdir, os.F_OK):
         os.mkdir(plotdir)
     return plotdir
 
-def plot_fit_transform(pca, X, comps, plotname, keys, check_fit=False):
+def plot_transform(pfit, X, comps, plotname, keys, check_fit=True):
     "do pca fit transform of original data, check components"
-    pfit = pca.fit_transform(X)   # class ndarray
     print('  pfit shape', pfit.shape)
     print(pfit[:3])
     
     if check_fit:
-        # check components
         print("  PCA comp norm?", np.allclose( \
             list(map(lambda e: sum(e*e), comps)), \
             np.ones(shape=(len(keys)))))
@@ -54,21 +56,28 @@ def plot_fit_transform(pca, X, comps, plotname, keys, check_fit=False):
     plotname += '_fit' + '.png'
     plt.savefig(plotname)
 
-def do_pca_fit(loansData, plotname, keys, rescale=True):
-    "do pca fit and fit transform"
-
-    mp = map( lambda k: np.matrix(loansData[k]).T, keys )
-    X = np.column_stack(mp)
-
-#    if (rescale):
-#        X = StandardScaler().fit_transform(X)
-
-    pca = PCA()
-    pout = pca.fit(X)
+def plot_pca_svm(preds):
+    print("preds", preds)
+    px = [e[0] for e in preds]
+    py = [e[1] for e in preds]
+    hscale = len(py)
+    pylabel = list(map(lambda y: "{:.3f}".format(y), py))
     
-    plot_fit_transform(pca, X, pout.components_, plotname, keys, check_fit=True)
+    plt.clf()
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+#    plt.bar(px, py, width=8, tick_label=px, color='blue', align='center')
+    plt.bar(range(len(py)), py, tick_label=px, color='blue', align='center')
+    for i, txt in enumerate(pylabel):
+        ax.annotate(txt, (i-0.2+0.2/hscale, py[i]+0.01), size='small')
+        
+    plt.ylim([0.5, 1.0])
+    plt.xlabel('Number of PCA Components')
+    plt.ylabel('SVM Predict Score')
+    plt.title('Human Activity by Smartphone Data, SVM with PCA')
     
-    return pca, pout
+    plotname = get_plotdir() + 'pca_svm.png'
+    plt.savefig(plotname)
 
 def plot_comps(pout, plotname, keys):
     "plot pca components in PCA-0, PCA-1 plane"
@@ -79,17 +88,17 @@ def plot_comps(pout, plotname, keys):
     plt.clf()
     compx = comps[0,:]
     compy = comps[1,:]
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
+#    fig = plt.figure()
+#    ax = fig.add_subplot(111)
     plt.plot(compx, compy, 'o', color='blue', alpha=0.5)
     plt.plot([0.0], [0.0], '+', color='black', alpha=1.0)  # center position
-    for i, txt in enumerate(keys):
-        ax.annotate(txt, (compx[i], compy[i]), size='x-small')
-    plt.xlim([-1.2,1.2])
-    plt.ylim([-1.2,1.2])
+#    for i, txt in enumerate(keys):
+#        ax.annotate(txt, (compx[i], compy[i]), size='x-small')
+    plt.xlim([-0.02,0.02])
+    plt.ylim([-0.2,0.2])
     plt.xlabel('PCA-0')
     plt.ylabel('PCA-1')
-    plt.title('Human Activity Data by Smartphone, PCA Components')
+    plt.title('Human Activity by Smartphone Data, PCA Components')
     plotname += '_comps' + '.png'
     plt.savefig(plotname)
 
@@ -98,7 +107,7 @@ def plot_var_ratio(pout, plotname, numkeys):
 #    varratio = pout.explained_variance_ratio_    # ndarray
     varratio = pout.explained_variance_ratio_[:numkeys]
     varsum = reduce(lambda x,y: x+y, varratio)
-    print('  explained_variance_ratio:', varratio, ': sum =', varsum)
+    print('  explained_variance_ratio:', varratio[:3], '...', varratio[-3:], ': sum =', varsum)
     vartotal = (100 * pd.Series(varratio).cumsum()).values
     vartotal = list(filter(lambda x: x<96.0, vartotal))  # cutoff 96% for label
     vartotal = list(map(lambda x: "{:.0f}%".format(x), vartotal))  # python 3 preferred
@@ -109,8 +118,11 @@ def plot_var_ratio(pout, plotname, numkeys):
     ax = fig.add_subplot(111)
     hscale = len(varratio)
     plt.bar(range(hscale), varratio, color='blue', align='center')
+    plt.text(0.7, 0.94, 'Cumulative sum of explained variance: {:.1f}%'.format(varsum*100),
+        bbox=dict(edgecolor='black', fill=False), 
+        transform=ax.transAxes, horizontalalignment='center', verticalalignment='center')
     if numkeys < 40:       # otherwise text too crowded to see
-        plt.text(0.7, 0.85, 'Cumulative percentage of    \nexplained variance is shown',
+        plt.text(0.8, 0.25, 'Cumulative percentage of    \nexplained variance is shown',
             bbox=dict(edgecolor='black', fill=False), 
             transform=ax.transAxes, horizontalalignment='center', verticalalignment='center')
         for i, txt in enumerate(vartotal):
@@ -122,29 +134,36 @@ def plot_var_ratio(pout, plotname, numkeys):
     plotname += '_var' + '.png'
     plt.savefig(plotname)
 
-def do_pca(dftrain, filename, rescale=True):
-    "do pca analysis and plots for set of independent variables (keys)"    
-
-    keys = dftrain.columns
-    print('do_pca', filename, ': keylen', len(keys))
-    plotname = getPlotDir() + filename
-    pca, pout = do_pca_fit(dftrain, plotname, keys, rescale)
+def plot_comps_vars(pout, plotname, keys):
     plot_comps(pout, plotname, keys)
     plot_var_ratio(pout, plotname, len(keys))
     plot_var_ratio(pout, plotname+"_100", 100)
     plot_var_ratio(pout, plotname+"_030", 30)
     plot_var_ratio(pout, plotname+"_020", 20)
     plot_var_ratio(pout, plotname+"_010", 10)
-    
-    print('  done: %s' % filename)
-    return pca
 
-def simple_pca(dftrain, dftest, ncomps=30):
+def explore_pca(dftrain, dftest, filename):
+    "do pca analysis and plots for set of independent variables (keys)"    
+
+    keys = dftrain.columns
+    print('do_pca', filename, ': keylen', len(keys))
+    plotname = get_plotdir() + filename
+    
+    pca = PCA()
+    pout = pca.fit(dftrain)
+    X_train = pca.transform(dftrain)
+    X_test = pca.transform(dftest)
+    
+    plot_transform(X_train, dftrain, pout.components_, plotname, keys)
+    plot_comps_vars(pout, plotname, keys)
+    
+    return X_train, X_test
+
+def quick_pca(dftrain, dftest, ncomps=100):
     pca = PCA(n_components=ncomps)
     pca.fit(dftrain)
     X_train = pca.transform(dftrain)
     X_test = pca.transform(dftest)
-#    print("pca X_shapes", X_train.shape, X_test.shape)
     return X_train, X_test
 
 def do_svm(dftrain, dftrain_y, dftest, dftest_y, label=''):
@@ -152,12 +171,9 @@ def do_svm(dftrain, dftrain_y, dftest, dftest_y, label=''):
     print("fit shapes", dftrain.shape, dftrain_y.shape, dftest.shape, dftest_y.shape)
     clf.fit(dftrain, dftrain_y['Y'])
     fit_score = clf.score(dftrain, dftrain_y['Y'])
-    p_score = clf.score(dftest, dftest_y['Y'])
-#    print("fit score", fit_score)
-    pred_y = clf.predict( dftest )
-    pred_correct = sum(pred_y == dftest_y['Y'])
-    pred_score = pred_correct/dftest_y.shape[0]
-    print("%s: svm fit score %.5f, predict score %.5f %.5f" % (label, fit_score, pred_score, p_score))
+    pred_score = clf.score(dftest, dftest_y['Y'])
+    print("%s: svm fit score %.5f, predict score %.5f" % (label, fit_score, pred_score))
+    return pred_score
 
 
 def main():
@@ -166,27 +182,27 @@ def main():
     
     dftrain = renameColumns(dftrain)
     dftest = renameColumns(dftest)
-    print("dftrain shape head", dftrain.shape, "\n", dftrain[:5])
-    print("dftest shape head", dftest.shape, "\n", dftest[:5])
+    print("dftrain shape head", dftrain.shape, "\n", dftrain[:3])
+    print("dftest shape head", dftest.shape, "\n", dftest[:3])
     
-    pca = do_pca(dftrain, "all", rescale=False)
+    make_plotdir()
+    explore_pca(dftrain, dftest, "all")    # 562 columns
 
     do_svm(dftrain, dftrain_y, dftest, dftest_y, 'raw data, all cols')
     do_svm(dftrain.ix[:, :30], dftrain_y, dftest.ix[:, :30], dftest_y, 'raw data, 30 cols')
     
-#    X_train, X_test = simple_pca(dftrain, dftest, ncomps=30)
-#    do_svm(X_train, dftrain_y, X_test, dftest_y)
-#    X_train, X_test = simple_pca(dftrain, dftest, ncomps=50)
-#    do_svm(X_train, dftrain_y, X_test, dftest_y)
-#    X_train, X_test = simple_pca(dftrain, dftest, ncomps=100)
-#    do_svm(X_train, dftrain_y, X_test, dftest_y)
+    X_train, X_test = quick_pca(dftrain, dftest, ncomps=100)
     
-    X_train, X_test = simple_pca(dftrain, dftest, ncomps=562)
-    do_svm(X_train[:, :30], dftrain_y, X_test[:, :30], dftest_y, 'pca 30 cols')
-    do_svm(X_train[:, :50], dftrain_y, X_test[:, :50], dftest_y, 'pca 50 cols')
-    do_svm(X_train[:, :100], dftrain_y, X_test[:, :100], dftest_y, 'pca 100 cols')
+    preds = []
+    for j in [10, 20, 30, 50, 100]:
+        p = do_svm(X_train[:, :j], dftrain_y, X_test[:, :j], dftest_y, 'pca {:.0f} cols'.format(j))
+        preds.append((j, p))
+   
+    plot_pca_svm(preds)
 
 
 if __name__ == '__main__':
     main()
+
+# to do:  cross-validation, confusion matrix
 
