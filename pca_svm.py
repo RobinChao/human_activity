@@ -7,8 +7,7 @@ import seaborn as sns
 from functools import reduce
 from sklearn import cross_validation
 from sklearn.grid_search import GridSearchCV
-from sklearn.metrics import classification_report
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.decomposition import PCA
 from sklearn.svm import LinearSVC
 import os
@@ -166,13 +165,20 @@ def quick_pca(dftrain, dftest, ncomps=100):
     X_test = pca.transform(dftest)
     return X_train, X_test
 
-def do_svm(dftrain, dftrain_y, dftest, dftest_y, label=''):
+def confusion_report(dftest_y, new_y):
+    print("classification report\n%s" % classification_report(dftest_y['Y'], new_y))
+    cm = confusion_matrix(dftest_y['Y'], new_y)
+    print("confusion matrix\n%s" % cm)
+
+def do_svm(dftrain, dftrain_y, dftest, dftest_y, label='x'):
     clf = LinearSVC()
     print("fit shapes", dftrain.shape, dftrain_y.shape, dftest.shape, dftest_y.shape)
     clf.fit(dftrain, dftrain_y['Y'])
     fit_score = clf.score(dftrain, dftrain_y['Y'])
     pred_score = clf.score(dftest, dftest_y['Y'])
+    new_y = clf.predict(dftest)
     print("%s: svm fit score %.5f, predict score %.5f" % (label, fit_score, pred_score))
+    confusion_report(dftest_y, new_y)
     return pred_score
 
 
@@ -197,12 +203,16 @@ def main():
     for j in [10, 20, 30, 50, 100]:
         p = do_svm(X_train[:, :j], dftrain_y, X_test[:, :j], dftest_y, 'pca {:.0f} cols'.format(j))
         preds.append((j, p))
-   
     plot_pca_svm(preds)
+    
+    txt = '''\nConclusion: Using PCA as input to LinearSVM is effective, with 91% accuracy using only
+30 components (5.4% of 562 total).  For six predicted classes, a classification
+report shows precision of 85% and greater (also confirmed by confusion matrix).'''
+    print(txt)
 
 
 if __name__ == '__main__':
     main()
 
-# to do:  cross-validation, confusion matrix
+# to do:  cross-validation
 
