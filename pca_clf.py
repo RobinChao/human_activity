@@ -5,11 +5,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from functools import reduce
-from sklearn import cross_validation
+from sklearn.cross_validation import cross_val_score
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.decomposition import PCA
 from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression as lr
 import os
 
 from read_clean_data import readRawColumns, readRawData
@@ -55,7 +56,7 @@ def plot_transform(pfit, X, comps, plotname, keys, check_fit=True):
     plotname += '_fit' + '.png'
     plt.savefig(plotname)
 
-def plot_pca_svm(preds):
+def plot_pca_fit(preds, label, title):
     print("preds", preds)
     px = [e[0] for e in preds]
     py = [e[1] for e in preds]
@@ -69,13 +70,13 @@ def plot_pca_svm(preds):
     plt.bar(range(len(py)), py, tick_label=px, color='blue', align='center')
     for i, txt in enumerate(pylabel):
         ax.annotate(txt, (i-0.2+0.2/hscale, py[i]+0.01), size='small')
-        
+    
     plt.ylim([0.5, 1.0])
     plt.xlabel('Number of PCA Components')
-    plt.ylabel('SVM Predict Score')
-    plt.title('Human Activity by Smartphone Data, SVM with PCA')
+    plt.ylabel('Predict Score')
+    plt.title("Human Activity by Smartphone Data, "+title+" with PCA")
     
-    plotname = get_plotdir() + 'pca_svm.png'
+    plotname = get_plotdir() + 'pca_'+label+'.png'
     plt.savefig(plotname)
 
 def plot_comps(pout, plotname, keys):
@@ -87,12 +88,8 @@ def plot_comps(pout, plotname, keys):
     plt.clf()
     compx = comps[0,:]
     compy = comps[1,:]
-#    fig = plt.figure()
-#    ax = fig.add_subplot(111)
     plt.plot(compx, compy, 'o', color='blue', alpha=0.5)
     plt.plot([0.0], [0.0], '+', color='black', alpha=1.0)  # center position
-#    for i, txt in enumerate(keys):
-#        ax.annotate(txt, (compx[i], compy[i]), size='x-small')
     plt.xlim([-0.02,0.02])
     plt.ylim([-0.2,0.2])
     plt.xlabel('PCA-0')
@@ -117,13 +114,13 @@ def plot_var_ratio(pout, plotname, numkeys):
     ax = fig.add_subplot(111)
     hscale = len(varratio)
     plt.bar(range(hscale), varratio, color='blue', align='center')
-    plt.text(0.7, 0.94, 'Cumulative sum of explained variance: {:.1f}%'.format(varsum*100),
+    plt.text(0.67, 0.94, 'Total cumulative sum of explained variance: {:.1f}%'.format(varsum*100),
         bbox=dict(edgecolor='black', fill=False), 
         transform=ax.transAxes, horizontalalignment='center', verticalalignment='center')
     if numkeys < 40:       # otherwise text too crowded to see
-        plt.text(0.8, 0.25, 'Cumulative percentage of    \nexplained variance is shown',
-            bbox=dict(edgecolor='black', fill=False), 
-            transform=ax.transAxes, horizontalalignment='center', verticalalignment='center')
+        plt.text(0.634, 0.25, 'Cumulative sum of\nexplained variance is shown',
+            bbox=dict(edgecolor='black', fill=False),
+            transform=ax.transAxes, horizontalalignment='left', verticalalignment='center')
         for i, txt in enumerate(vartotal):
             ax.annotate(txt, (i-0.2+0.2/hscale, varratio[i]+0.002), size='x-small')
     plt.xlim([-0.6, hscale-0.4])
@@ -165,22 +162,33 @@ def quick_pca(dftrain, dftest, ncomps=100):
     X_test = pca.transform(dftest)
     return X_train, X_test
 
+def do_svc_gridsearch(dftrain, dftrain_y):
+    clf = LinearSVC()
+    print("Grid search svc")
+    param_grid = [{'C': [0.1, 1.0, 10.0]}]
+    gs = GridSearchCV(estimator=clf, param_grid=param_grid, cv=5, \
+      verbose=1, n_jobs=-1, scoring='accuracy')
+    gs.fit(dftrain, dftrain_y['Y'])
+    print("svc grid scores %s" % gs.grid_scores_)
+
 def confusion_report(dftest_y, new_y):
     print("classification report\n%s" % classification_report(dftest_y['Y'], new_y))
     cm = confusion_matrix(dftest_y['Y'], new_y)
     print("confusion matrix\n%s" % cm)
 
-def do_svm(dftrain, dftrain_y, dftest, dftest_y, label='x'):
-    clf = LinearSVC()
+def fit_predict(clf, dftrain, dftrain_y, dftest, dftest_y, label='x'):
     print("fit shapes", dftrain.shape, dftrain_y.shape, dftest.shape, dftest_y.shape)
     clf.fit(dftrain, dftrain_y['Y'])
     fit_score = clf.score(dftrain, dftrain_y['Y'])
     pred_score = clf.score(dftest, dftest_y['Y'])
     new_y = clf.predict(dftest)
-    print("%s: svm fit score %.5f, predict score %.5f" % (label, fit_score, pred_score))
+    print("%s: fit score %.5f, predict score %.5f" % (label, fit_score, pred_score))
     confusion_report(dftest_y, new_y)
     return pred_score
 
+def get_cv_scores(clf, dftrain, dftrain_y, cv=10):
+    scores = cross_val_score(clf, dftrain, dftrain_y['Y'], cv=cv)
+    print("CV scores mean %.4f, std %.4f \nscores %s" % (scores.mean(), scores.std(), scores))
 
 def main():
     dfcol, dups = readRawColumns()
@@ -190,29 +198,52 @@ def main():
     dftest = renameColumns(dftest)
     print("dftrain shape head", dftrain.shape, "\n", dftrain[:3])
     print("dftest shape head", dftest.shape, "\n", dftest[:3])
+    print("dftrain stats\n", dftrain.describe())
+    # groupby subject, activity(y) ?
+#    print("dftrain group by subject stats\n", dftrain.groupby('subject').describe())
     
     make_plotdir()
     explore_pca(dftrain, dftest, "all")    # 562 columns
 
-    do_svm(dftrain, dftrain_y, dftest, dftest_y, 'raw data, all cols')
-    do_svm(dftrain.ix[:, :30], dftrain_y, dftest.ix[:, :30], dftest_y, 'raw data, 30 cols')
+    clf = LinearSVC()
+    print("fitting LinearSVC")
+    fit_predict(clf, dftrain, dftrain_y, dftest, dftest_y, 'raw data, all cols')
+    fit_predict(clf, dftrain.ix[:, :30], dftrain_y, dftest.ix[:, :30], dftest_y, 'raw data, 30 cols')
+    # 30 columns not sorted by pca - only 70% accuracy
     
     X_train, X_test = quick_pca(dftrain, dftest, ncomps=100)
     
+    print("fitting LinearSVC with PCA input")
     preds = []
     for j in [10, 20, 30, 50, 100]:
-        p = do_svm(X_train[:, :j], dftrain_y, X_test[:, :j], dftest_y, 'pca {:.0f} cols'.format(j))
+        p = fit_predict(clf, X_train[:, :j], dftrain_y, X_test[:, :j], dftest_y, 'pca {:d} cols'.format(j))
         preds.append((j, p))
-    plot_pca_svm(preds)
+    plot_pca_fit(preds, "svc", "SVC")
     
-    txt = '''\nConclusion: Using PCA as input to LinearSVM is effective, with 91% accuracy using only
-30 components (5.4% of 562 total).  For six predicted classes, a classification
-report shows precision of 85% and greater (also confirmed by confusion matrix).'''
+    do_svc_gridsearch(X_train[:, :30], dftrain_y)
+    
+    print("Cross-validating LinearSVC with PCA input")
+    get_cv_scores(clf, X_train[:, :30], dftrain_y)  # randomized, not grouped by subject
+    # 30 columns sorted by pca - 89% accuracy
+    
+    clf = lr()
+    print("fitting Logistic Regression with PCA input")
+    preds = []
+    for j in [10, 20, 30, 50, 100]:
+        p = fit_predict(clf, X_train[:, :j], dftrain_y, X_test[:, :j], dftest_y, 'pca {:d} cols'.format(j))
+        preds.append((j, p))
+    plot_pca_fit(preds, "lr", "Logistic Regression")
+    print("Cross-validating Logistic Regression with PCA input")
+    get_cv_scores(clf, X_train[:, :30], dftrain_y)
+    
+    txt = '''\nConclusion: Using PCA as input to Logistic Regression or LinearSVC is effective, 
+with 91% accuracy using only 30 components (5.4% of 562 total).  For six 
+predicted classes, a classification report shows precision of 85% and greater 
+(also confirmed by confusion matrix).  Cross-validation gives average fit 
+scores of 89% +- 5%.'''
     print(txt)
 
 
 if __name__ == '__main__':
     main()
-
-# to do:  cross-validation
 
