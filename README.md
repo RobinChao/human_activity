@@ -22,11 +22,11 @@ A cross-validation table and confusion matrix plot show a clear distinction betw
 Script output is given in __clean_predict_allvar.txt__ and plots in __human_activity_plots/__.
 
 #### Prediction: PCA with SVM and Logistic Regression
-Prediction using PCA as input to classifiers is given in __pca_clf.py__.   PCA dimensionality reduction was performed on all 562 columns.  Using just the first 10 primary components accounts for 91% of explained variance ratio, while 100 components accounts for 98% of explained variance.  Using the first 30 components, representing 5.5% of the total, accounts for 95% of the explained variance, and seems a reasonable value for classifier input.  
+Prediction using PCA as input to classifiers is given in __pca_clf.py__.   PCA dimensionality reduction was performed using all 562 columns.  Just the first 10 primary components account for 91% of explained variance ratio, while 100 components accounts for 98% of explained variance.  Using the first 30 components, representing 5.5% of the total, accounts for 95% of the explained variance, and seems a reasonable value for classifier input.  
 
 Script output is give in __pca_clf_output.txt__ and plots in __human_activity_pca_plots/__.
 
-Using PCA as input to Logistic Regression gives increasing accuracy with number of PCA components, with ~89% training data accuracy for average human activities for 30 components.  Ten-fold cross-validation of with 30 PCA components gives a standard error estimate of 5%, probably due to random variation in the data.  
+Using PCA as input to Logistic Regression to fit training data gives reasonable accuracy (85%) with only 10 components, increasing with the number of PCA components.  30 PCA components gives 89% training data accuracy for all activities, with a standard error of 5% estimated by ten-fold cross-validation (due to variation between folds).  Test data prediction accuracy is within the training data fit margin of error.  
 
 <img src="https://github.com/bfetler/human_activity/blob/master/human_activity_pca_plots/pca_lr.png" alt="Logistic Regression Score with Varying Number of PCA Components" />
 
