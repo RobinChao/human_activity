@@ -24,8 +24,34 @@ Script output is given in __clean_predict_allvar.txt__ and plots in __human_acti
 #### Prediction: PCA with SVM and Logistic Regression
 Prediction using PCA as input to classifiers is given in __pca_clf.py__.   PCA dimensionality reduction was performed on all 562 columns.  Using just the first 10 primary components accounts for 91% of explained variance ratio, while 100 components accounts for 98% of explained variance.  Using the first 30 components, representing 5.5% of the total, accounts for 95% of the explained variance, and seems a reasonable value for classifier input.  
 
-Using 30 PCA columns as input to LinearSVC (chosen for speed) gives ~89% training data accuracy for average human activities, with test data accuracy for each activity between 85% and 93%.  Ten-fold cross-validation of training data gives a standard error estimate of 5%, probably due to random variation in the data.  Repeating the procedure using PCA as input to Logistic Regression gives similar results.  
-
 Script output is give in __pca_clf_output.txt__ and plots in __human_activity_pca_plots/__.
+
+Using PCA as input to Logistic Regression gives increasing accuracy with number of PCA components, with ~89% training data accuracy for average human activities for 30 components.  Ten-fold cross-validation of with 30 PCA components gives a standard error estimate of 5%, probably due to random variation in the data.  
+
+<img src="https://github.com/bfetler/human_activity/blob/master/human_activity_pca_plots/pca_lr.png" alt="Logistic Regression Score with Varying Number of PCA Components" />
+
+Test data accuracy for each activity is between 85% and 93%, as shown by classification report.  Laying down may be a more separable activity from the others due to inactivity, but a score of 100% is probably not reliable.  
+<table>
+<tr>
+  <td><strong>Activity</strong></td>
+  <td>Walking</td>
+  <td>Walking Upstairs</td>
+  <td>Walking Downstairs</td>
+  <td>Sitting</td>
+  <td>Standing</td>
+  <td>Laying Down</td>
+</tr>
+<tr>
+  <td><strong>Precision</strong></td>
+  <td>0.89</td>
+  <td>0.93</td>
+  <td>0.92</td>
+  <td>0.91</td>
+  <td>0.85</td>
+  <td>1.00</td>
+</tr>
+</table>
+
+Repeating the procedure using PCA as input to LinearSVC (chosen for speed) gives similar results.  
 
 PCA with SVM or Logistic Regression seems to be faster and more accurate than Random Forest alone.  
