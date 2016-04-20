@@ -1,7 +1,7 @@
 ## Human Activity Prediction Using Smartphones Data
 Could you predict human behavior using smartphone accelerometer and gyroscope data?  We can try, using the [Human Activity Recognition Using Smartphones Data Set](https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones) from UC Irvine.  
 
-Accelerator and gyroscope data from a Samsung Galaxy S II smartphone was measured for 30 subjects performing six activites.  The raw smartphone data was processed into 561 variable columns.  Each subject repeated the activities over 50 times, resulting in over 10,000 rows of data.  Data was split into 21 subjects for training data and 9 subjects for test data.  The six activities were:
+Accelerator and gyroscope data from a Samsung Galaxy S II smartphone was measured for 30 subjects performing six activites.  The smartphone data contained 561 variable columns.  Each subject repeated the activities over 50 times, resulting in over 10,000 rows of data.  Data was split into 21 subjects for training data and 9 subjects for test data.  The six activities were:
 + *WALKING*
 + *WALKING_UPSTAIRS*
 + *WALKING_DOWNSTAIRS*
@@ -14,15 +14,47 @@ Accelerator and gyroscope data from a Samsung Galaxy S II smartphone was measure
 + Prediction was also done using [Primary Component Analysis](http://scikit-learn.org/stable/modules/decomposition.html#pca) to reduce dimensionality before input to [Logistic Regression](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) and [Support Vector Machines](http://scikit-learn.org/stable/modules/svm.html#svm) Classifiers from scikit-learn.
 
 #### Random Forest Optimization
-Data exploration is given in __read_clean_data.py__.  Multiple column labels seemed redundant, and were reduced to 478 columns.  A grid search exploration of the maximum number of features at each split and number of estimators gave 85% to 90% prediction accuracy on the training set with validation.  Each parameter set was cross validated three times, showing some variation by max_features, though not always significant, and no variation for number of estimators.  From cross validation, I created boxplots to show the range of variation between data folds.  
+Data exploration of training data is given in __read_clean_data.py__, with script output in __read_clean_data.txt__ and plots in __human_activity_plots/__.  Multiple column labels seemed redundant, and were reduced to 478 columns.  A grid search exploration of the maximum number of features per split, and number of estimators (trees) gave 85% to 90% prediction accuracy on the training set with validation.  Each parameter set was cross validated three times, showing some variation by max_features, though not always statistically significant, and no significant variation for number of estimators.  From cross validation scores boxplots were created, showing the range of variation between data folds.  
 <img src="https://github.com/bfetler/human_activity/blob/master/human_activity_plots/gridscore_max_features.png" alt="Random Forest Score by Max Features at each split (max_features)" />
 <img src="https://github.com/bfetler/human_activity/blob/master/human_activity_plots/gridscore_n_estimators.png" alt="Random Forest Score by Number of Estimators (n_estimators)" />
 
-The top ten important columns varied from one repetition to the next, with seven being consistently within them.  A near optimum was estimated at {*n_estimators 100*, *max_features 'sqrt'*}, and 90% prediction accuracy was confirmed on test data.  
+The top ten important columns varied from one repetition to the next, with seven being consistently within them.  A near optimum was estimated at {*n_estimators 100*, *max_features 'log2'*}.   Prediction on test data with optimum parameters gave 90% accuracy.  
 
-A clear distinction between active (*WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS*) and sedentary (*SITTING, STANDING, LAYING*) activities can be made with histograms of several top importance variables.  
+A clear distinction between active (*WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS*) and sedentary (*SITTING, STANDING, LAYING*) activities can be seen in a cross table of predicted variables.
 
-Script output is given in __read_clean_data.txt__ and plots in __human_activity_plots/__.
+Test data accuracy for each activity is shown by classification report.  Laying down may be more separable from the others due to inactivity, but a score of 100% is probably not reliable.  
+<table>
+<tr>
+  <td><strong>Activity</strong></td>
+  <td>Walking</td>
+  <td>Walking Upstairs</td>
+  <td>Walking Downstairs</td>
+  <td>Sitting</td>
+  <td>Standing</td>
+  <td>Laying</td>
+</tr>
+<tr>
+  <td><strong>Precision</strong></td>
+  <td>0.83</td>
+  <td>0.89</td>
+  <td>0.95</td>
+  <td>0.95</td>
+  <td>0.92</td>
+  <td>1.00</td>
+</tr>
+</table>
+
+The top ten importance columns varied by run, and typically included:
++ tGravityAcc_max_X
++ tGravityAcc_Mean_Y
++ tGravityAcc_min_X
++ angle_X_gravityMean
++ tGravityAcc_Mean_X
++ angle_Y_gravityMean
++ tGravityAcc_min_Y 
++ tGravityAcc_energy_Y
++ tGravityAcc_max_Y 
++ fAcc_energy
 
 #### Random Forest Prediction
 Further prediction was done with the full set of columns, given in __clean_predict_allvar.py__.  Train, validation and test data were reduced to a smaller set of subjects.  Classification parameters were explored more thoroughly in a grid search, with similar results: up to 90% prediction accuracy of validation data.  Variation is shown in a boxplot.  Near optimum parameters {'n_estimators': 50, 'max_features': 'log2'} were confirmed with test data, with 80% accuracy.  This is probably due to using fewer variable rows.
