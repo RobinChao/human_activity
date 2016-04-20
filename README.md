@@ -14,8 +14,9 @@ Accelerator and gyroscope data from a Samsung Galaxy S II smartphone was measure
 + Prediction was also done using [Primary Component Analysis](http://scikit-learn.org/stable/modules/decomposition.html#pca) to reduce dimensionality before input to [Logistic Regression](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) and [Support Vector Machines](http://scikit-learn.org/stable/modules/svm.html#svm) Classifiers from scikit-learn.
 
 #### Random Forest Optimization
-Data exploration is given in __read_clean_data.py__.  Multiple column labels seemed redundant, and were reduced to 478 columns.  A grid search exploration of the number of estimators and tree depth gave 85% to 90% prediction accuracy on the training set with validation.  Each parameter set was repeated several times, showing little variation between most of them, as shown in boxplots.  
-<img src="https://github.com/bfetler/human_activity/blob/master/human_activity_pca_plots/pca_lr.png" alt="Logistic Regression Score with Varying Number of PCA Components" />
+Data exploration is given in __read_clean_data.py__.  Multiple column labels seemed redundant, and were reduced to 478 columns.  A grid search exploration of the maximum number of features at each split and number of estimators gave 85% to 90% prediction accuracy on the training set with validation.  Each parameter set was cross validated three times, showing some variation by max_features, though not always significant, and no variation for number of estimators.  From cross validation, I created boxplots to show the range of variation between data folds.  
+<img src="https://github.com/bfetler/human_activity/blob/master/human_activity_plots/gridscore_max_features.png" alt="Random Forest Score by Max Features at each split (max_features)" />
+<img src="https://github.com/bfetler/human_activity/blob/master/human_activity_plots/gridscore_n_estimators.png" alt="Random Forest Score by Number of Estimators (n_estimators)" />
 
 The top ten important columns varied from one repetition to the next, with seven being consistently within them.  A near optimum was estimated at {*n_estimators 100*, *max_features 'sqrt'*}, and 90% prediction accuracy was confirmed on test data.  
 
