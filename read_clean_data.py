@@ -135,7 +135,7 @@ def readRawData(dfcol, printOut=False):
     dftest, dftest_y = readRawTestData(dfcol, dfact, printOut)
     return dftrain, dftrain_y, dftest, dftest_y
 
-def checkDuplicateColumns(dfcol, dups):
+def checkDuplicateColumns(dfcol, dups, dftrain):
     '''check duplicate columns'''
     print("DUPS, len =", len(dups))
     for dup in dups:
@@ -263,7 +263,7 @@ def gridscoreBoxplot(gslist, plotdir, label, xlabel):
     plt.ylabel("Fraction Correct")
     plt.savefig(plotdir + "gridscore_" + label)
 
-if __name__ == '__main__':
+def main():
     dfcol, dups = readRawColumns(printOut=True)
     dftrain, dftrain_y, dftest, dftest_y = readRawData(dfcol, printOut=True)
     
@@ -419,4 +419,7 @@ if __name__ == '__main__':
     print("test log2 oobs mean %.5f, std %.5f" % (np.mean(oobs), np.std(oobs)))
 
     print("activity labels:\n", readActivityLabels())
+
+if __name__ == '__main__':
+    main()
 
