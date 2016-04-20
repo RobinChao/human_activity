@@ -18,11 +18,9 @@ Data exploration of training data is given in __read_clean_data.py__, with scrip
 <img src="https://github.com/bfetler/human_activity/blob/master/human_activity_plots/gridscore_max_features.png" alt="Random Forest Score by Max Features at each split (max_features)" />
 <img src="https://github.com/bfetler/human_activity/blob/master/human_activity_plots/gridscore_n_estimators.png" alt="Random Forest Score by Number of Estimators (n_estimators)" />
 
-The top ten important columns varied from one repetition to the next, with seven being consistently within them.  A near optimum was estimated at {*n_estimators 100*, *max_features 'log2'*}.   Prediction on test data with optimum parameters gave 90% accuracy.  
+A near optimum was estimated at {*n_estimators: 100*, *max_features: 'sqrt'*}.   Prediction on test data with optimum parameters gave 90% accuracy.  
 
-A clear distinction between active (*WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS*) and sedentary (*SITTING, STANDING, LAYING*) activities can be seen in a cross table of predicted variables.
-
-Test data accuracy for each activity is shown by classification report.  Laying down may be more separable from the others due to inactivity, but a score of 100% is probably not reliable.  
+Test data accuracy for each activity is shown by classification report.  Laying may be more separable from the others due to inactivity, but a score of 100% is probably not reliable.  
 <table>
 <tr>
   <td><strong>Activity</strong></td>
@@ -44,24 +42,24 @@ Test data accuracy for each activity is shown by classification report.  Laying 
 </tr>
 </table>
 
-The top ten importance columns varied by run, and typically included:
-+ tGravityAcc_max_X
-+ tGravityAcc_Mean_Y
-+ tGravityAcc_min_X
-+ angle_X_gravityMean
-+ tGravityAcc_Mean_X
-+ angle_Y_gravityMean
-+ tGravityAcc_min_Y 
-+ tGravityAcc_energy_Y
-+ tGravityAcc_max_Y 
-+ fAcc_energy
-
 #### Random Forest Prediction
-Further prediction was done with the full set of columns, given in __clean_predict_allvar.py__.  Train, validation and test data were reduced to a smaller set of subjects.  Classification parameters were explored more thoroughly in a grid search, with similar results: up to 90% prediction accuracy of validation data.  Variation is shown in a boxplot.  Near optimum parameters {'n_estimators': 50, 'max_features': 'log2'} were confirmed with test data, with 80% accuracy.  This is probably due to using fewer variable rows.
+Further prediction was done with the full set of columns, given in __clean_predict_allvar.py__, with script output in __clean_predict_allvar.txt__ and plots in __human_activity_plots/__.  Train, validation and test data were reduced to a smaller set of subjects.  Classification parameters were explored more thoroughly in a grid search, with similar results: up to 90% prediction accuracy of validation data.  Variation is shown in a boxplot.  Near optimum parameters {n_estimators: 50, max_features: 'log2'} were used to predict test data with 80% accuracy.  This is probably due to using fewer variable rows.
 
-A cross-validation table and confusion matrix plot show a clear distinction between active (*WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS*) and sedentary (*SITTING, STANDING, LAYING*) activities.  However, there seems to be some correlation (up to 10%) within active activities, and more so (up to 50%) within sedentary activies.  Accuracy of each activity is between 60% and 90%.  The top ten columns account for 19.5% of total importance.  
+A cross-validation table and confusion matrix plot show a clear distinction between active (*WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS*) and sedentary (*SITTING, STANDING, LAYING*) activities, with some correlation within each group.  Accuracy of each activity is between 60% and 90%.  
 
-Script output is given in __clean_predict_allvar.txt__ and plots in __human_activity_plots/__.
+<img src="https://github.com/bfetler/human_activity/blob/master/human_activity_plots/opt_conf_mat.png" alt="Confusion Matrix" />
+
+The top ten columns account for 19.5% of total importance, and varied from one repetition to the next.  They typically include:
++ tGravityAcc_min_X
++ tGravityAcc_Mean_X
++ tGravityAcc_max_X
++ angle_X_gravityMean
++ tGravityAcc_energy_X
++ tGravityAcc_energy_Z
++ tGravityAcc_max_Z
++ angle_Z_gravityMean
++ tGravityAcc_Mean_Z
++ angle_Y_gravityMean
 
 #### Prediction: PCA with SVM and Logistic Regression
 Prediction using PCA as input to classifiers is given in __pca_clf.py__.   PCA dimensionality reduction was performed using all 562 columns.  Just the first 10 primary components account for 91% of explained variance ratio, while 100 components accounts for 98% of explained variance.  Using the first 30 components, representing 5.5% of the total, accounts for 95% of the explained variance, and seems a reasonable value for classifier input.  
@@ -72,7 +70,7 @@ Using PCA as input to Logistic Regression to fit training data gives reasonable 
 
 <img src="https://github.com/bfetler/human_activity/blob/master/human_activity_pca_plots/pca_lr.png" alt="Logistic Regression Score with Varying Number of PCA Components" />
 
-Test data accuracy for each activity is between 85% and 93%, as shown by classification report.  Laying down may be more separable from the others due to inactivity, but a score of 100% is probably not reliable.  
+Test data accuracy for each activity is between 85% and 93%, as shown by classification report.  Laying may be more separable from the others due to inactivity, but a score of 100% is probably not reliable.  
 <table>
 <tr>
   <td><strong>Activity</strong></td>
