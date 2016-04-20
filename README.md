@@ -1,11 +1,11 @@
 # human_activity
 
-#### Human Activity by Smartphone Data Set
-[Human Activity Recognition Using Smartphones Data](https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones) is available from UC Irvine for Machine Learning tasks.  Accelerator and gyroscope data from a Samsung Galaxy S II smartphone was measured for 30 subjects performing six activites (*WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS, SITTING, STANDING, LAYING*).  The raw smartphone data was processed into 561 variable columns.  Each subject repeated the activities over 50 times, resulting in over 10,000 rows of data.  Data was split into 21 subjects for training data and 9 subjects for test data.  
+#### Human Activity Prediction Using Smartphones Data
+Could you predict human behavior using smartphone accelerometer and gyroscope data?  An answer can be attempted using the [Human Activity Recognition Using Smartphones Data Set](https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones) from UC Irvine.  Accelerator and gyroscope data from a Samsung Galaxy S II smartphone was measured for 30 subjects performing six activites (*WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS, SITTING, STANDING, LAYING*).  The raw smartphone data was processed into 561 variable columns.  Each subject repeated the activities over 50 times, resulting in over 10,000 rows of data.  Data was split into 21 subjects for training data and 9 subjects for test data.  
 
-#### Prediction by Random Forest and Primary Component Analysis
+#### Prediction by Random Forest and PCA with Logistic Regression
 + Prediction of human activity was done using a [Random Forest Classifier](http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html) from scikit-learn.  
-+ Prediction was also done using [Primary Component Analysis](http://scikit-learn.org/stable/modules/decomposition.html#pca) to reduce dimensionality before input to [Support Vector Machines](http://scikit-learn.org/stable/modules/svm.html#svm) and [Logistic Regression](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) Classifiers from scikit-learn.
++ Prediction was also done using [Primary Component Analysis](http://scikit-learn.org/stable/modules/decomposition.html#pca) to reduce dimensionality before input to [Logistic Regression](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) and [Support Vector Machines](http://scikit-learn.org/stable/modules/svm.html#svm) Classifiers from scikit-learn.
 
 #### Exploration: Random Forest
 Data exploration is given in __read_clean_data.py__.  Multiple column labels seemed redundant, and were reduced to 478 columns.  Classification parameters were explored using a grid search, giving 85% to 90% prediction accuracy on a validation set.  Each parameter set was repeated several times, showing little variation between many of them, as shown in boxplots.  The top ten important columns varied from one repetition to the next, with seven being consistently within them.  A near optimum was estimated at {*n_estimators 100*, *max_features 'sqrt'*}, and 90% prediction accuracy was confirmed on test data.  
@@ -30,7 +30,7 @@ Using PCA as input to Logistic Regression to fit training data gives reasonable 
 
 <img src="https://github.com/bfetler/human_activity/blob/master/human_activity_pca_plots/pca_lr.png" alt="Logistic Regression Score with Varying Number of PCA Components" />
 
-Test data accuracy for each activity is between 85% and 93%, as shown by classification report.  Laying down may be a more separable activity from the others due to inactivity, but a score of 100% is probably not reliable.  
+Test data accuracy for each activity is between 85% and 93%, as shown by classification report.  Laying down may be more separable from the others due to inactivity, but a score of 100% is probably not reliable.  
 <table>
 <tr>
   <td><strong>Activity</strong></td>
@@ -39,7 +39,7 @@ Test data accuracy for each activity is between 85% and 93%, as shown by classif
   <td>Walking Downstairs</td>
   <td>Sitting</td>
   <td>Standing</td>
-  <td>Laying Down</td>
+  <td>Laying</td>
 </tr>
 <tr>
   <td><strong>Precision</strong></td>
@@ -52,6 +52,6 @@ Test data accuracy for each activity is between 85% and 93%, as shown by classif
 </tr>
 </table>
 
-Repeating the procedure using PCA as input to LinearSVC (chosen for speed) gives similar results.  
+Repeating the procedure using PCA as input to LinearSVC gives similar results.  
 
-PCA with SVM or Logistic Regression seems to be faster and more accurate than Random Forest alone.  
+PCA with Logistic Regression or SVM seems to be faster and more accurate than Random Forest alone.  
