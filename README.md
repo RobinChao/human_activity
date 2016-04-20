@@ -1,5 +1,5 @@
 ## Human Activity Prediction Using Smartphones Data
-Could you predict human behavior using smartphone accelerometer and gyroscope data?  We can try, using the [Human Activity Recognition Using Smartphones Data Set](https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones) from UC Irvine.  
+Can we predict human behavior using smartphone accelerometer and gyroscope data?  We can try, using the [Human Activity Recognition Using Smartphones Data Set](https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones) from UC Irvine.  
 
 Accelerator and gyroscope data from a Samsung Galaxy S II smartphone was measured for 30 subjects performing six activites.  The smartphone data contained 561 variable columns.  Each subject repeated the activities over 50 times, resulting in over 10,000 rows of data.  Data was split into 21 subjects for training data and 9 subjects for test data.  The six activities were:
 + *WALKING*
@@ -92,6 +92,9 @@ Test data accuracy for each activity is between 85% and 93%, as shown by classif
 </tr>
 </table>
 
-Repeating the procedure using PCA as input to LinearSVC gives similar results.  
+Repeating the procedure using PCA as input to LinearSVC gives results similar to Logistic Regression.  
 
 PCA with Logistic Regression or SVM seems to be faster and more accurate than Random Forest alone.  
+
+#### Conclusion:
+Can we predict human activity using smartphone data?  __Yes,__ within reasonable bounds for some simple activities.  
