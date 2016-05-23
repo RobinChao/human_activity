@@ -1,7 +1,7 @@
 ## Human Activity Prediction Using Smartphones Data
-Can we predict human physical activity using smartphone data, using smartphone accelerometer and gyroscope measurements?  In a study by researchers, a dataset is available from the [Human Activity Recognition Using Smartphones Data Set](https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones) from the UC Irvine Machine Learning Repository to help address this question.  
+Can we predict human physical activity using smartphone data, using smartphone accelerometer and gyroscope measurements?  In a study by researchers, the [Human Activity Recognition Using Smartphones Data Set](https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones) is available from the UC Irvine Machine Learning Repository to help address this question.  
 
-Accelerator and gyroscope data from a Samsung Galaxy S II smartphone was measured for 30 subjects performing six activites.  The smartphone data contained 561 variable columns, plus one column for the subject.  Most of the accelerometer and gyroscope data is reported as seemingly random variables between -1 and +1.  Each subject repeated the activities over 50 times, resulting in over 10,000 rows of data.  Data was split into 21 subjects for training data and 9 subjects for test data.  The six activities were:
+Accelerator and gyroscope data from a *Samsung Galaxy S II* smartphone was measured for 30 subjects performing six activites.  The smartphone data contained 561 variable columns, plus one column for the subject.  Most of the accelerometer and gyroscope data is reported as seemingly random variables in the range -1.0 to +1.0.  Each subject repeated the activities over 50 times, resulting in over 10,000 rows of data.  Data was split into 21 subjects for training data and 9 subjects for test data.  The six activities were:
 + *WALKING*
 + *WALKING_UPSTAIRS*
 + *WALKING_DOWNSTAIRS*
@@ -15,7 +15,7 @@ The set of activity categories is fairly simple, but may serve as a template for
 + Prediction of human activity was done using a [Random Forest Classifier](http://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html).  
 + Prediction was also done using [Primary Component Analysis](http://scikit-learn.org/stable/modules/decomposition.html#pca) to reduce dimensionality before input to [Logistic Regression](http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html) and [Support Vector Machines](http://scikit-learn.org/stable/modules/svm.html#svm) Classifiers, similar to the classic [eigenfaces](https://en.wikipedia.org/wiki/Eigenface) approach.
 
-Both methods show that only 20 to 30 variables out of 561 are needed to classify behavior.
+Both methods show that only 20 to 30 variables out of 500+ are needed to classify behavior.
 
 #### Random Forest Optimization
 Data exploration of training data is given in __read_clean_data.py__, with script output in __read_clean_data.txt__ and plots in __human_activity_plots/__.  Multiple column labels seemed duplicated or redundant, and were reduced to 478 columns.  A grid search exploration of the maximum number of features per split, and number of estimators (trees) gave 80% to 90% fit accuracy on the training set with validation.  Each parameter set was cross validated three times, showing some variation by *max_features*.  However, variation due to *max_features* was often not statistically significant (t-test p-value greater than 0.05), and fit score variation due to number of estimators (*n_estimators*) was also not significant.  Boxplots were created from cross validation scores, showing the range of variation within the data.  
